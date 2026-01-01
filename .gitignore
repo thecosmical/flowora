@@ -1,0 +1,22 @@
+# OS
+.DS_Store
+
+# Node / Angular
+node_modules/
+dist/
+.angular/
+.cache/
+
+# Env
+.env
+.env.*
+
+# Java / Spring
+target/
+*.log
+*.class
+
+# IDE
+.idea/
+.vscode/
+*.iml
