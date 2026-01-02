@@ -6,11 +6,8 @@
     </div>
     <div class="actions">
       <div class="populate">
-        <span>Add Populate:</span>
-        <select
-          [ngModel]="selectedTemplate()"
-          (ngModelChange)="selectedTemplate.set($event); populate($event)"
-        >
+        <span>Populate:</span>
+        <select class="fx-select small" [value]="selectedTemplate()" (change)="selectedTemplate.set($any($event.target).value); populate($any($event.target).value)">
           <option *ngFor="let t of templateOptions()" [value]="t">{{ t }}</option>
         </select>
       </div>
@@ -22,19 +19,17 @@
   <div class="card">
     <div class="section-title">Identifiers</div>
     <div class="grid">
-      <label title="Enter item name">
+      <label>
         <span>Name *</span>
-        <input [ngModel]="form().name" (ngModelChange)="updateField('name', $event)" placeholder="LED Light 350W" />
+        <input type="text" [ngModel]="form().name" (ngModelChange)="updateField('name', $event)" placeholder="LED Light 350W" />
       </label>
-
-      <label title="Unique SKU/Code">
+      <label>
         <span>Code *</span>
-        <input [ngModel]="form().code" (ngModelChange)="updateField('code', $event)" placeholder="LL1250" />
+        <input type="text" [ngModel]="form().code" (ngModelChange)="updateField('code', $event)" placeholder="LL1250" />
       </label>
-
       <label>
         <span>Prev. Code</span>
-        <input [ngModel]="form().prevCode" (ngModelChange)="updateField('prevCode', $event)" placeholder="LL1250A" />
+        <input type="text" [ngModel]="form().prevCode" (ngModelChange)="updateField('prevCode', $event)" placeholder="LL1250A" />
       </label>
     </div>
 
@@ -43,30 +38,37 @@
       <label>
         <span>Category *</span>
         <div class="inline">
-          <select [ngModel]="form().category" (ngModelChange)="updateField('category', $event)">
+          <select class="fx-select" [value]="form().category" (change)="updateField('category', $any($event.target).value)">
             <option value="" disabled>Select category</option>
             <option *ngFor="let c of categoryOptions()" [value]="c">{{ c }}</option>
           </select>
-          <input #newCat placeholder="New" />
-          <button type="button" class="small" (click)="onAddCategory(newCat.value)">+</button>
+          <input class="fx-input" #newCat placeholder="Add new" />
+          <button class="small ghost" type="button" (click)="onAddCategory(newCat.value)">+ Add</button>
         </div>
+      </label>
+
+      <label>
+        <span>Industry *</span>
+        <select class="fx-select" [value]="form().industry" (change)="updateField('industry', $any($event.target).value)">
+          <option *ngFor="let ind of industryOptions" [value]="ind">{{ ind }}</option>
+        </select>
       </label>
 
       <label>
         <span>Sub-Category *</span>
         <div class="inline">
-          <select [ngModel]="form().subCategory" (ngModelChange)="updateField('subCategory', $event)">
+          <select class="fx-select" [value]="form().subCategory" (change)="updateField('subCategory', $any($event.target).value)">
             <option value="" disabled>Select sub-category</option>
             <option *ngFor="let c of subCategoryOptions()" [value]="c">{{ c }}</option>
           </select>
-          <input #newSub placeholder="New" />
-          <button type="button" class="small" (click)="onAddSubCategory(newSub.value)">+</button>
+          <input class="fx-input" #newSub placeholder="Add new" />
+          <button class="small ghost" type="button" (click)="onAddSubCategory(newSub.value)">+ Add</button>
         </div>
       </label>
 
       <label>
         <span>Batch Type</span>
-        <select [ngModel]="form().batchType" (ngModelChange)="updateField('batchType', $event)">
+        <select class="fx-select" [value]="form().batchType" (change)="updateField('batchType', $any($event.target).value)">
           <option value="">Select</option>
           <option *ngFor="let b of batchTypes" [value]="b">{{ b }}</option>
         </select>
@@ -82,7 +84,7 @@
 
       <label>
         <span>Unit *</span>
-        <select [ngModel]="form().unit" (ngModelChange)="updateField('unit', $event)">
+        <select class="fx-select" [value]="form().unit" (change)="updateField('unit', $any($event.target).value)">
           <option *ngFor="let u of units" [value]="u">{{ u }}</option>
         </select>
       </label>
@@ -90,12 +92,12 @@
       <label>
         <span>Store *</span>
         <div class="inline">
-          <select [ngModel]="form().storeId" (ngModelChange)="updateField('storeId', $event)">
+          <select class="fx-select" [value]="form().storeId" (change)="updateField('storeId', $any($event.target).value)">
             <option value="" disabled>Select store</option>
             <option *ngFor="let s of storeOptions()" [value]="s.id">{{ s.name }}</option>
           </select>
-          <input #newStore placeholder="New store" />
-          <button type="button" class="small" (click)="onAddStore(newStore.value)">+</button>
+          <input class="fx-input" #newStore placeholder="New store" />
+          <button class="small ghost" type="button" (click)="onAddStore(newStore.value)">+ Add</button>
         </div>
       </label>
     </div>
@@ -104,11 +106,10 @@
     <div class="grid">
       <label>
         <span>Importance</span>
-        <input [ngModel]="form().importance" (ngModelChange)="updateField('importance', $event)" />
+        <input type="text" [ngModel]="form().importance" (ngModelChange)="updateField('importance', $event)" placeholder="Critical / High / Normal" />
       </label>
-
       <label>
-        <span>Types *</span>
+        <span>Type tags</span>
         <div class="chips">
           <button
             type="button"
@@ -122,19 +123,19 @@
         </div>
       </label>
 
-      <label class="flags">
+      <div class="flags">
         <span>Flags</span>
         <div class="checks">
-          <label>
-            <input type="checkbox" [checked]="form().internalManufacturing" (change)="updateField('internalManufacturing', ($any($event.target)).checked)" />
+          <label class="fx-check">
+            <input type="checkbox" [checked]="form().internalManufacturing" (change)="updateField('internalManufacturing', $any($event.target).checked)" />
             Internal Manufacturing
           </label>
-          <label>
-            <input type="checkbox" [checked]="form().purchase" (change)="updateField('purchase', ($any($event.target)).checked)" />
+          <label class="fx-check">
+            <input type="checkbox" [checked]="form().purchase" (change)="updateField('purchase', $any($event.target).checked)" />
             Purchase
           </label>
         </div>
-      </label>
+      </div>
     </div>
 
     <div class="section-title">Pricing</div>
@@ -158,7 +159,7 @@
     <div class="grid">
       <label>
         <span>HSN/SAC</span>
-        <input [ngModel]="form().hsnSac" (ngModelChange)="updateField('hsnSac', $event)" />
+        <input type="text" [ngModel]="form().hsnSac" (ngModelChange)="updateField('hsnSac', $event)" />
       </label>
       <label>
         <span>GST %</span>
@@ -194,13 +195,23 @@
       </label>
     </div>
 
+    <div class="section-title">Min Stock by Location</div>
+    <div class="grid">
+      <label *ngFor="let s of storeOptions()">
+        <span>{{ s.name }}</span>
+        <input type="number" min="0"
+               [ngModel]="form().minStockByLocation[s.id] || 0"
+               (ngModelChange)="setMinForLocation(s.id, $event)" />
+      </label>
+    </div>
+
     <div class="section-title">Tags</div>
     <div class="grid">
       <label>
         <span>Add Tag</span>
         <div class="inline">
-          <input [ngModel]="form().newTag" (ngModelChange)="updateField('newTag', $event)" placeholder="350W" />
-          <button type="button" class="small" (click)="addTag()">+</button>
+          <input class="fx-input" [ngModel]="form().newTag" (ngModelChange)="updateField('newTag', $event)" placeholder="350W" />
+          <button class="small ghost" type="button" (click)="addTag()">+ Add</button>
         </div>
         <div class="tags">
           <span class="tag" *ngFor="let t of form().tags">

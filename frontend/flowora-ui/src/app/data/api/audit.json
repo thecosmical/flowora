@@ -1,0 +1,67 @@
+{
+  "entries": [
+    {
+      "id": "AUD-001",
+      "action": "REQUEST_APPROVED",
+      "entity": "REQ-LPG-001",
+      "details": "Tarun (CEO) approved issue for LPG 15kg batch.",
+      "by": "Tarun (CEO)",
+      "at": "2024-12-15T12:05:00Z",
+      "meta": { "requester": "Ananya (Ops Lead)", "approver": "Tarun (CEO)" }
+    },
+    {
+      "id": "AUD-002",
+      "action": "STOCK_UPDATE",
+      "entity": "IT-STEEL-315",
+      "details": "Split 1500 kg steel coil for shell blanking.",
+      "by": "Ananya (Ops Lead)",
+      "at": "2024-12-15T14:15:00Z",
+      "meta": {
+        "itemId": "IT-STEEL-315",
+        "itemName": "Steel Coil IS 2062 (3.15mm)",
+        "sku": "STL-315-COIL",
+        "qty": 1500,
+        "location": "Selaqui Plant - Line 1"
+      }
+    },
+    {
+      "id": "AUD-003",
+      "action": "TASK_STATUS",
+      "entity": "IT-HYDRO-PLUG",
+      "details": "Task TASK-QA-PLUG -> BREACHED (hydro plug calibration overdue).",
+      "by": "QA Desk",
+      "at": "2024-12-18T09:00:00Z",
+      "meta": {
+        "itemId": "IT-HYDRO-PLUG",
+        "itemName": "Hydro Test Plug & Cap Kit",
+        "sku": "HYD-PLUG-TEST",
+        "qty": 10,
+        "requester": "QA Desk"
+      }
+    },
+    {
+      "id": "AUD-004",
+      "action": "REQUEST_REJECTED",
+      "entity": "REQ-LPG-002",
+      "details": "Hold 33kg batch: QA sequencing not ready; reroute after hydro plugs pass.",
+      "by": "Tarun (CEO)",
+      "at": "2024-12-12T09:30:00Z",
+      "meta": { "requester": "Megha (QA)", "approver": "Tarun (CEO)" }
+    },
+    {
+      "id": "AUD-005",
+      "action": "WASTAGE_LOG",
+      "entity": "IT-PAINT-RED",
+      "details": "10L top coat scrapped after expiry.",
+      "by": "qa@vansh",
+      "at": "2024-12-17T08:15:00Z",
+      "meta": {
+        "itemId": "IT-PAINT-RED",
+        "itemName": "Top Coat Signal Red (RAL 3001)",
+        "sku": "PNT-TOP-RED",
+        "qty": 10,
+        "requester": "QA Lab"
+      }
+    }
+  ]
+}

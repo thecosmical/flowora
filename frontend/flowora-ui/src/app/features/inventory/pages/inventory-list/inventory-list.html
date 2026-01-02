@@ -2,54 +2,47 @@
   <section class="fx-card fx-pad">
     <div class="fx-head">
       <div>
-        <h2 class="fx-title">Raw Inventory</h2>
-        <div class="fx-sub">Track batches & expiry across locations • FEFO ready</div>
+        <h2 class="fx-title">Inventory Workspace</h2>
+        <div class="fx-sub">Industry-ready stock, batches, and earliest-expiry tracking across locations</div>
       </div>
       <div class="fx-head-actions">
         <span class="fx-sub">Scope: <b>{{ scopeLabel() }}</b></span>
-        <a class="fx-btnlink fx-btn-ghost" routerLink="/inventory/create">+ Create SKU</a>
+        <a class="fx-btn ghost small" routerLink="/inventory/create">+ Create SKU</a>
       </div>
     </div>
 
-    <div class="fx-row" style="margin-top: 14px;">
-      <input
-        class="fx-input"
-        [value]="q()"
-        (input)="q.set(($any($event.target)).value)"
-        placeholder="Search SKU / Name / Category"
-      />
+    <div class="fx-row filters">
+      <label class="fx-input-group">
+        <span>Search SKU / Name / Category / Industry</span>
+        <input class="fx-input" [value]="q()" (input)="q.set(($any($event.target)).value)" placeholder="Search..." />
+      </label>
 
-      <select
-        class="fx-select"
-        [value]="scopeMode() === 'ALL' ? 'ALL' : selectedLocationId()"
-        (change)="($any($event.target)).value === 'ALL' ? setScopeAll() : setScopeOne(($any($event.target)).value)"
-      >
-        <option value="ALL">All Locations</option>
-        <option *ngFor="let l of locations()" [value]="l.id">{{ l.name }}</option>
-      </select>
+      <label class="fx-input-group">
+        <span>Location</span>
+        <select class="fx-select" [value]="scopeMode() === 'ALL' ? 'ALL' : selectedLocationId()" (change)="($any($event.target).value === 'ALL') ? setScopeAll() : setScopeOne($any($event.target).value)">
+          <option value="ALL">All Locations</option>
+          <option *ngFor="let l of locations()" [value]="l.id">{{ l.name }}</option>
+        </select>
+      </label>
 
-      <select
-        class="fx-select"
-        [value]="expDays() === null ? 'NONE' : expDays()"
-        (change)="($any($event.target)).value === 'NONE' ? expDays.set(null) : expDays.set(+($any($event.target)).value)"
-      >
-        <option value="30">Expiring ≤ 30d</option>
-        <option value="15">Expiring ≤ 15d</option>
-        <option value="7">Expiring ≤ 7d</option>
-        <option value="NONE">No expiry filter</option>
-      </select>
+      <label class="fx-input-group">
+        <span>Expiry filter</span>
+        <select class="fx-select" [value]="expDays() === null ? 'NONE' : expDays()" (change)="($any($event.target).value === 'NONE') ? expDays.set(null) : expDays.set(+($any($event.target).value))">
+          <option value="30">Expiring ≤ 30d</option>
+          <option value="15">Expiring ≤ 15d</option>
+          <option value="7">Expiring ≤ 7d</option>
+          <option value="NONE">No expiry filter</option>
+        </select>
+      </label>
 
       <label class="fx-check">
-        <input type="checkbox" [checked]="lowOnly()" (change)="lowOnly.set(($any($event.target)).checked)" />
+        <input type="checkbox" [checked]="lowOnly()" (change)="lowOnly.set($any($event.target).checked)" />
         Low stock
       </label>
-
       <label class="fx-check">
-        <input type="checkbox" [checked]="showInactive()" (change)="showInactive.set(($any($event.target)).checked)" />
+        <input type="checkbox" [checked]="showInactive()" (change)="showInactive.set($any($event.target).checked)" />
         Show inactive
       </label>
-
-      <div class="fx-spacer"></div>
     </div>
 
     <table class="fx-table">
@@ -57,9 +50,11 @@
       <tr>
         <th class="fx-th">SKU</th>
         <th class="fx-th">Name</th>
+        <th class="fx-th">Industry</th>
         <th class="fx-th">Category</th>
         <th class="fx-th">HSN/SAC</th>
         <th class="fx-th fx-num">Stock</th>
+        <th class="fx-th fx-num">Min (scope)</th>
         <th class="fx-th">Earliest Expiry</th>
         <th class="fx-th">Status</th>
         <th class="fx-th">Risk</th>
@@ -69,25 +64,30 @@
 
       <tbody>
       <ng-container *ngFor="let r of rows()">
-        <tr class="fx-tr">
+        <tr class="fx-tr" [ngClass]="rowClass(r)">
           <td class="fx-td fx-mono">{{ r.item.sku }}</td>
           <td class="fx-td">{{ r.item.name }}</td>
+          <td class="fx-td">{{ r.item.industry || '-' }}</td>
           <td class="fx-td">{{ r.item.category }}</td>
           <td class="fx-td fx-mono">{{ r.item.hsnSac ?? '-' }}</td>
-          <td class="fx-td fx-num">{{ r.qty }}</td>
+          <td class="fx-td fx-num">
+            <span *ngIf="r.qty === 0" class="fx-sub">0 (Awaiting stock)</span>
+            <span *ngIf="r.qty !== 0">{{ r.qty }}</span>
+          </td>
+          <td class="fx-td fx-num">{{ r.min || '-' }}</td>
           <td class="fx-td fx-mono">{{ r.earliest ?? '-' }}</td>
           <td class="fx-td">{{ r.item.status }}</td>
           <td class="fx-td">
-            <span class="fx-pill bad" *ngIf="r.expired">Expired</span>
-            <span class="fx-pill warn" *ngIf="!r.expired && r.expSoon">Expiring</span>
-            <span class="fx-pill low" *ngIf="r.low">Low</span>
-            <span class="fx-pill ok" *ngIf="!r.expired && !r.expSoon && !r.low">OK</span>
+            <span class="fx-pill stockout" *ngIf="r.risk === 'STOCKOUT'">● Out of Stock</span>
+            <span class="fx-pill low" *ngIf="r.risk === 'LOW'">● Low</span>
+            <span class="fx-pill warn" *ngIf="r.risk === 'EXPIRING'">● Expiring</span>
+            <span class="fx-pill ok" *ngIf="r.risk === 'OK'">● Healthy</span>
           </td>
           <td class="fx-td" style="text-align:right;">
-            <button class="pill-btn" type="button" (click)="toggle(r.item.id)" [attr.aria-expanded]="openId() === r.item.id">
-              <span class="fx-btnlink">Details</span>
-              <span class="chevron">{{ openId() === r.item.id ? '▲' : '▼' }}</span>
+            <button class="fx-btn ghost small" type="button" (click)="toggle(r.item.id)" [attr.aria-expanded]="openId() === r.item.id">
+              {{ openId() === r.item.id ? 'Hide details' : 'Show details' }}
             </button>
+            <a class="fx-btnlink underline" [routerLink]="['/inventory', r.item.id]" style="margin-left:6px;">View item</a>
           </td>
         </tr>
         <tr class="fx-detail" *ngIf="openId() === r.item.id">
@@ -96,39 +96,114 @@
               <div class="detail-head">
                 <div>
                   <div class="detail-title">{{ r.item.name }}</div>
-                  <div class="detail-sub">SKU {{ r.item.sku }} • {{ r.item.category }}</div>
+                  <div class="detail-sub">SKU {{ r.item.sku }} • {{ r.item.category }} • {{ r.item.industry || 'Industry' }}</div>
                 </div>
                 <div class="detail-actions">
-                  <a class="fx-btnlink" [routerLink]="['/inventory', r.item.id]">View</a>
-                  <a class="fx-btnlink" [routerLink]="['/inventory', r.item.id, 'issue']">Issue / Consume</a>
+                  <a class="fx-btn ghost small" [routerLink]="['/inventory', r.item.id]" target="_blank">Open SKU</a>
+                  <div class="action-menu">
+                    <button type="button" class="fx-btn ghost small" (click)="toggleActionMenu(r.item.id)">
+                      Perform Action ▾
+                    </button>
+                    <div class="menu" *ngIf="openActionId() === r.item.id">
+                      <button type="button" (click)="performAction(r, 'PLACE_ORDER')">Place order task</button>
+                      <button type="button" (click)="performAction(r, 'REJECT_DECISION')">Reject suggestion</button>
+                    </div>
+                  </div>
                 </div>
               </div>
 
-              <div class="detail-grid">
-                <div class="metric">
-                  <div class="label">Stock</div>
-                  <div class="value">{{ r.qty }}</div>
+            <div class="detail-grid">
+              <div class="metric">
+                <div class="label">Stock</div>
+                <div class="value">{{ r.qty }}</div>
+              </div>
+              <div class="metric">
+                <div class="label">Min</div>
+                <div class="value">{{ r.min }}</div>
+              </div>
+              <div class="metric">
+                <div class="label">HSN/SAC</div>
+                <div class="value mono">{{ r.item.hsnSac || '-' }}</div>
+              </div>
+              <div class="metric">
+                <div class="label">Earliest Expiry</div>
+                <div class="value mono">{{ r.earliest || '-' }}</div>
+              </div>
+              <div class="metric">
+                <div class="label">Scope</div>
+                <div class="value">{{ scopeLabel() }}</div>
+              </div>
+              <div class="metric">
+                <div class="label">Tags</div>
+                <div class="value">{{ r.item.tags?.join(', ') || '-' }}</div>
+              </div>
+              <div class="metric">
+                <div class="label">Industry</div>
+                <div class="value">{{ r.item.industry || 'Not tagged' }}</div>
+              </div>
+            </div>
+
+              <div class="decisions">
+                <ng-container *ngIf="recommendation(r.item.id, r.qty) as rec">
+                <div class="dec-head">
+                  <div>
+                    <div class="detail-title">Decision Assist</div>
+                    <div class="detail-sub">Reorder guard using demand, lead time, and a safety buffer.</div>
+                  </div>
                 </div>
-                <div class="metric">
-                  <div class="label">Min</div>
-                  <div class="value">{{ r.min }}</div>
+                <div class="dec-row">
+                  <div class="metric">
+                    <div class="label">Suggested Reorder</div>
+                    <div class="value">{{ rec.suggestedQty }}</div>
+                  </div>
+                  <div class="metric">
+                    <div class="label">Cost Impact</div>
+                    <div class="value">{{ formatCurrency(rec.costImpact) }}</div>
+                  </div>
+                  <div class="metric">
+                    <div class="label">Stockout Risk</div>
+                    <div class="value">
+                      <span class="fx-pill" [ngClass]="rec.risk.toLowerCase()">
+                        {{ rec.risk }}
+                      </span>
+                    </div>
+                  </div>
                 </div>
-                <div class="metric">
-                  <div class="label">HSN/SAC</div>
-                  <div class="value mono">{{ r.item.hsnSac || '-' }}</div>
+                <div class="dec-rationale">
+                  {{ rec.rationale }}
+                  • Demand avg {{ demandContext(r.item.id).avgMonthly | number:'1.0-0' }}/mo • Lead {{ demandContext(r.item.id).leadDays }}d • Buffer {{ demandContext(r.item.id).bufferDays }}d.
                 </div>
-                <div class="metric">
-                  <div class="label">Earliest Expiry</div>
-                  <div class="value mono">{{ r.earliest || '-' }}</div>
+
+                <div class="sim">
+                  <div class="line-head">What-if: tweak PO to see capital & sell-through</div>
+                  <div class="sim-grid">
+                    <label>
+                      <span>Qty</span>
+                      <input type="number" [value]="simQty()" (input)="simQty.set(+($any($event.target)).value)" />
+                    </label>
+                    <label>
+                      <span>Price</span>
+                      <input type="number" [value]="simPrice()" (input)="simPrice.set(+($any($event.target)).value)" />
+                    </label>
+                    <label>
+                      <span>Arrival Time (days)</span>
+                      <input type="number" [value]="simLead()" (input)="simLead.set(+($any($event.target)).value)" />
+                    </label>
+                    <div class="sim-metric" *ngIf="simulation(r) as sim">
+                      <div class="label">Working Capital</div>
+                      <div class="value">{{ formatCurrency(sim.workingCapital) }}</div>
+                    </div>
+                    <div class="sim-metric" *ngIf="simulation(r) as sim">
+                      <div class="label">Sell-through (days)</div>
+                      <div class="value">{{ sim.sellThroughDays }}</div>
+                    </div>
+                    <div class="sim-metric" *ngIf="simulation(r) as sim">
+                      <div class="label">Simulated Risk</div>
+                      <div class="value">{{ sim.risk }}</div>
+                    </div>
+                  </div>
                 </div>
-                <div class="metric">
-                  <div class="label">Scope</div>
-                  <div class="value">{{ scopeLabel() }}</div>
-                </div>
-                <div class="metric">
-                  <div class="label">Tags</div>
-                  <div class="value">{{ r.item.tags?.join(', ') || '-' }}</div>
-                </div>
+                </ng-container>
               </div>
             </div>
           </td>

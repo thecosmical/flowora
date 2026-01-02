@@ -40,6 +40,14 @@
         <div class="label">Rejected</div>
         <div class="value">{{ v.totals.rejected }}</div>
       </div>
+      <div class="card">
+        <div class="label">Variance</div>
+        <div class="value" [class.warn]="v.totals.variance !== 0">{{ v.totals.variance }}</div>
+      </div>
+      <div class="card">
+        <div class="label">Pending Requests</div>
+        <div class="value">{{ v.totals.pending }}</div>
+      </div>
     </div>
 
     <h3>Requests</h3>

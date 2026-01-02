@@ -30,6 +30,7 @@ yarn-error.log
 
 # Miscellaneous
 /.angular/cache
+/.angular/
 .sass-cache/
 /connect.lock
 /coverage
@@ -37,6 +38,7 @@ yarn-error.log
 testem.log
 /typings
 __screenshots__/
+.tmp/
 
 # System files
 .DS_Store

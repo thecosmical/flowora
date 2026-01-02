@@ -56,13 +56,18 @@
       </thead>
       <tbody>
       <tr class="fx-tr" *ngFor="let l of lineItems">
-        <td class="fx-td fx-mono">{{ l.itemId }}</td>
+        <td class="fx-td">
+          <div class="mono">{{ itemSku(l.itemId) }}</div>
+          <div>{{ itemName(l.itemId) }}</div>
+        </td>
         <td class="fx-td">{{ l.requestedQty }}</td>
         <td class="fx-td">{{ l.approvedQty }}</td>
         <td class="fx-td">{{ l.usedQty }}</td>
         <td class="fx-td">{{ l.returnedQty }}</td>
         <td class="fx-td">{{ l.rejectedQty }}</td>
         <td class="fx-td">{{ l.reason || '-' }}</td>
+        <td class="fx-td">Stock {{ itemStock(l.itemId) }}</td>
+        <td class="fx-td">Δ {{ l.approvedQty - l.usedQty - l.returnedQty - l.rejectedQty }}</td>
       </tr>
       </tbody>
     </table>

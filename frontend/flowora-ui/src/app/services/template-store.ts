@@ -7,6 +7,7 @@ export type TemplatePayload = {
   code?: string;
   prevCode?: string;
   category?: string;
+  industry?: string;
   subCategory?: string;
   batchType?: string;
   qty?: number;
@@ -36,6 +37,7 @@ const BASE_TEMPLATES: Record<string, TemplatePayload> = {
     code: 'LL-1250',
     prevCode: 'LL-1200',
     category: 'Lighting',
+    industry: 'Retail',
     subCategory: 'Blue Shade',
     batchType: 'No, Non-expirable',
     qty: 12,
@@ -58,6 +60,7 @@ const BASE_TEMPLATES: Record<string, TemplatePayload> = {
     code: 'ASM-204',
     prevCode: 'ASM-199',
     category: 'Assembly',
+    industry: 'Manufacturers',
     subCategory: 'Bracket',
     batchType: 'No, Non-expirable',
     qty: 50,
@@ -78,6 +81,7 @@ const BASE_TEMPLATES: Record<string, TemplatePayload> = {
     name: 'Amoxicillin 250mg',
     code: 'AMX-250',
     category: 'Medicine',
+    industry: 'Pharma',
     subCategory: 'Capsule',
     batchType: 'Yes, Expirable',
     qty: 100,

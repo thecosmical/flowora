@@ -9,7 +9,7 @@ import { RequestStore } from '../../../../services/request-store';
 type ProductSummary = {
   product: Product;
   requests: (ProductionRequest & { lines: ProductionRequestLine[]; totals: { used: number; returned: number; rejected: number } })[];
-  totals: { approved: number; used: number; returned: number; rejected: number };
+  totals: { approved: number; used: number; returned: number; rejected: number; variance: number; pending: number };
 };
 
 @Component({
@@ -48,10 +48,12 @@ export class ProductDetailComponent {
         acc.used += r.lines.reduce((s, l) => s + l.usedQty, 0);
         acc.returned += r.lines.reduce((s, l) => s + l.returnedQty, 0);
         acc.rejected += r.lines.reduce((s, l) => s + l.rejectedQty, 0);
+        if (r.status === 'PENDING') acc.pending += 1;
         return acc;
       },
-      { approved: 0, used: 0, returned: 0, rejected: 0 }
+      { approved: 0, used: 0, returned: 0, rejected: 0, pending: 0, variance: 0 }
     );
+    totals.variance = totals.approved - (totals.used + totals.returned + totals.rejected);
 
     return { product, requests, totals };
   });

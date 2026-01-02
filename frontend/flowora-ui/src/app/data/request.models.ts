@@ -13,6 +13,7 @@ export type Approval = {
 export type Attachment = {
   id: string;
   name: string;
+  docType?: 'PO' | 'GRN' | 'COA' | 'PHOTO' | 'OTHER';
   url?: string;
 };
 
@@ -54,4 +55,10 @@ export type ConsumptionEvent = {
   reason?: string;
   by: string;
   at: string;
+};
+
+export type ApprovalRule = {
+  type: RequestType;
+  minAmount?: number;
+  roles: UserRole[];
 };

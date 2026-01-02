@@ -1,0 +1,50 @@
+<div class="fx-container">
+  <section class="fx-card fx-pad">
+    <div class="fx-head">
+      <div>
+        <h2 class="fx-title">Audit Log</h2>
+        <div class="fx-sub">Read-only record of actions across the tool.</div>
+      </div>
+    </div>
+
+    <div class="filters">
+      <input class="fx-input" placeholder="Search action / entity / user" [value]="q()" (input)="q.set(($any($event.target)).value)" />
+      <select class="fx-select" [value]="actionFilter()" (change)="actionFilter.set(($any($event.target)).value)">
+        <option value="ALL">All actions</option>
+        <option *ngFor="let a of actions()" [value]="a">{{ a }}</option>
+      </select>
+    </div>
+
+    <table class="fx-table">
+      <thead>
+      <tr>
+        <th class="fx-th">When</th>
+        <th class="fx-th">Action</th>
+        <th class="fx-th">Item</th>
+        <th class="fx-th">HSN/SAC</th>
+        <th class="fx-th">Qty</th>
+        <th class="fx-th">Requester</th>
+        <th class="fx-th">Approver</th>
+        <th class="fx-th">Details</th>
+        <th class="fx-th">By</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr class="fx-tr" *ngFor="let e of view()">
+        <td class="fx-td fx-mono">{{ e.at }}</td>
+        <td class="fx-td">{{ e.action }}</td>
+        <td class="fx-td">{{ e.itemName || e.entityLabel }}</td>
+        <td class="fx-td">{{ e.hsn || '-' }}</td>
+        <td class="fx-td">{{ e.qty || '-' }}</td>
+        <td class="fx-td">{{ e.requester || '-' }}</td>
+        <td class="fx-td">{{ e.approver || '-' }}</td>
+        <td class="fx-td">{{ e.details }}</td>
+        <td class="fx-td">{{ e.by || '-' }}</td>
+      </tr>
+      <tr *ngIf="view().length === 0">
+        <td class="fx-td fx-empty" colspan="9">No audit entries.</td>
+      </tr>
+      </tbody>
+    </table>
+  </section>
+</div>

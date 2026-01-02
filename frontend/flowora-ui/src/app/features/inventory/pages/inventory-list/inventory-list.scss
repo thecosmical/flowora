@@ -57,3 +57,27 @@
 .mono {
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New';
 }
+
+.decisions { border: 1px solid var(--border-soft); border-radius: 12px; padding: 12px; display: grid; gap: 10px; background: #fdfefe; }
+.dec-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+.dec-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; }
+.dec-rationale { color: var(--ink-500); font-size: 13px; }
+.sim { border-top: 1px solid var(--border-soft); padding-top: 10px; display: grid; gap: 8px; }
+.sim-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; align-items: end; }
+.sim-grid label { display: grid; gap: 4px; font-size: 13px; }
+.sim-grid input { padding: 8px 10px; border: 1px solid var(--border-soft); border-radius: 10px; }
+.sim-metric { border: 1px solid var(--border-soft); border-radius: 10px; padding: 8px; background: #f8fafc; }
+.fx-pill.stockout { background:#fde5e1; border:1px solid #f3b0b0; color:#b42318; }
+.fx-pill.overstock { background:#fff4e5; border:1px solid #f4dcb5; color:#c56618; }
+.fx-pill.balanced { background:#e7f5ec; border:1px solid #bee3cc; color:#1c7c3a; }
+.action-menu { position: relative; }
+.action-menu .menu { position: absolute; right: 0; top: 36px; background: #fff; border: 1px solid var(--border-soft); border-radius: 10px; box-shadow: var(--shadow-xs); display: grid; min-width: 180px; }
+.action-menu .menu button { text-align: left; padding: 10px 12px; border: none; background: transparent; cursor: pointer; }
+.action-menu .menu button:hover { background: #f6f7fb; }
+
+.row-stockout .fx-td { background: linear-gradient(90deg, #fff7f5, #fff); color: #1f2430; border-left: 4px solid #d94a2b; }
+.row-low .fx-td { background: linear-gradient(90deg, #fffaf3, #fff); color: #1f2430; border-left: 4px solid #d08a1a; }
+.row-expiring .fx-td { background: linear-gradient(90deg, #f7fbff, #fff); color: #1f2430; border-left: 4px solid #1f6fbf; }
+.row-ok .fx-td { background: #fff; }
+.fx-pill.low { background:#fff4e5; border:1px solid #f4dcb5; color:#9b4c0d; }
+.fx-pill.warn { background:#eef5ff; border:1px solid #d1e2ff; color:#0b4f99; }

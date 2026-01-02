@@ -4,6 +4,7 @@ import { RouterLink } from '@angular/router';
 import { Product } from '../../../../data/inventory.models';
 import { ProductionRequest, ProductionRequestLine } from '../../../../data/request.models';
 import { RequestStore } from '../../../../services/request-store';
+import { InventoryStore } from '../../../../services/inventory-store';
 
 type RequestRow = ProductionRequest & {
   product?: Product | null;
@@ -14,12 +15,16 @@ type RequestRow = ProductionRequest & {
 @Component({
   selector: 'app-request-list',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [
+    CommonModule,
+    RouterLink
+  ],
   templateUrl: './request-list.html',
   styleUrl: './request-list.scss'
 })
 export class RequestListComponent {
-  private readonly store = new RequestStore();
+  private readonly store = inject(RequestStore);
+  private readonly inventory = inject(InventoryStore);
 
   readonly q = signal('');
   readonly status = signal<'ALL' | 'PENDING' | 'APPROVED' | 'REJECTED' | 'CLOSED'>('ALL');
@@ -63,5 +68,13 @@ export class RequestListComponent {
 
   toggle(id: string) {
     this.openId.set(this.openId() === id ? null : id);
+  }
+
+  itemName = (id: string) => this.inventory.items().find(i => i.id === id)?.name ?? id;
+  itemSku = (id: string) => this.inventory.items().find(i => i.id === id)?.sku ?? '';
+  itemStock = (id: string) => this.inventory.qtyForItemInScope(id);
+
+  variance(r: RequestRow) {
+    return r.totals.approved - (r.totals.used + r.totals.returned + r.totals.rejected);
   }
 }

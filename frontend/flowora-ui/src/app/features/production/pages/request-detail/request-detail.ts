@@ -5,6 +5,7 @@ import { Product } from '../../../../data/inventory.models';
 import { ConsumptionEvent, ProductionRequest, ProductionRequestLine } from '../../../../data/request.models';
 import { RequestStore } from '../../../../services/request-store';
 import { UserContextService } from '../../../../services/user-context';
+import { InventoryStore } from '../../../../services/inventory-store';
 
 @Component({
   selector: 'app-request-detail',
@@ -18,6 +19,7 @@ export class RequestDetailComponent {
   private readonly reqId = this.route.snapshot.paramMap.get('id') ?? '';
   private readonly store = inject(RequestStore);
   private readonly userCtx = inject(UserContextService);
+  private readonly inventory = inject(InventoryStore);
   readonly requestStore = this.store;
 
   readonly summary = computed(() => {
@@ -46,6 +48,18 @@ export class RequestDetailComponent {
 
   get history(): ConsumptionEvent[] {
     return this.store.eventsByRequest(this.reqId).sort((a, b) => b.at.localeCompare(a.at));
+  }
+
+  itemName(id: string) {
+    return this.inventory.items().find(i => i.id === id)?.name ?? id;
+  }
+
+  itemSku(id: string) {
+    return this.inventory.items().find(i => i.id === id)?.sku ?? '';
+  }
+
+  itemStock(id: string) {
+    return this.inventory.qtyForItemInScope(id);
   }
 
   canApprove(status: string) {

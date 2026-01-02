@@ -1,0 +1,81 @@
+<div class="fx-container">
+  <section class="fx-card fx-pad">
+    <div class="fx-head">
+      <div>
+        <h2 class="fx-title">Notification Center</h2>
+        <div class="fx-sub">Tasks and decisions assigned to you.</div>
+      </div>
+      <div class="fx-head-actions">
+        <select class="fx-select" [value]="status()" (change)="status.set(($any($event.target)).value)">
+          <option value="ALL">All</option>
+          <option value="PENDING">Pending</option>
+          <option value="RECEIVED">Received</option>
+          <option value="COMPLETED">Completed</option>
+          <option value="REJECTED">Rejected</option>
+          <option value="BREACHED">SLA Breached</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="fx-row" style="margin-top:12px;">
+      <div class="fx-sub">Messages can be marked as done, received, or rejected. SLA breach highlights in red.</div>
+    </div>
+
+    <table class="fx-table">
+      <thead>
+      <tr>
+        <th class="fx-th">Title</th>
+        <th class="fx-th">Item</th>
+        <th class="fx-th">HSN/SAC</th>
+        <th class="fx-th">Qty</th>
+        <th class="fx-th">Requested By</th>
+        <th class="fx-th">Approvers</th>
+        <th class="fx-th">Due Date</th>
+        <th class="fx-th">Status</th>
+        <th class="fx-th"></th>
+      </tr>
+      </thead>
+      <tbody>
+      <ng-container *ngFor="let t of tasks()">
+        <tr class="fx-tr">
+          <td class="fx-td">{{ t.title }}</td>
+          <td class="fx-td">
+            <div>{{ t.item?.name ?? t.itemId }}</div>
+            <div class="fx-sub">{{ t.item?.sku }}</div>
+          </td>
+          <td class="fx-td fx-mono">{{ t.item?.hsnSac || '-' }}</td>
+          <td class="fx-td">{{ t.qty }}</td>
+          <td class="fx-td">{{ t.request?.requestedBy || '-' }}</td>
+          <td class="fx-td">{{ t.request?.approvers?.join(', ') || '-' }}</td>
+          <td class="fx-td fx-mono">{{ t.dueDate }}</td>
+          <td class="fx-td">
+            <span class="fx-pill" [ngClass]="t.status.toLowerCase()">{{ t.status }}</span>
+          </td>
+          <td class="fx-td fx-num">
+            <button class="pill-btn" type="button" (click)="toggle(t.id)">{{ openId() === t.id ? '▲' : '▼' }}</button>
+          </td>
+        </tr>
+        <tr class="fx-detail" *ngIf="openId() === t.id">
+          <td class="fx-td" colspan="6">
+            <div class="detail-card">
+              <div class="detail-row">
+                <div><strong>Assignee:</strong> {{ t.assignee || 'Unassigned' }}</div>
+                <div><strong>Created:</strong> {{ t.createdAt }}</div>
+                <div><strong>SLA:</strong> {{ t.status === 'BREACHED' ? 'Breached' : 'Due ' + t.dueDate }}</div>
+              </div>
+              <div class="detail-actions">
+                <button class="btn" type="button" (click)="action(t.id, 'RECEIVED')">Mark Received</button>
+                <button class="btn" type="button" (click)="action(t.id, 'COMPLETED')">Mark Done</button>
+                <button class="btn ghost" type="button" (click)="action(t.id, 'REJECTED')">Reject</button>
+              </div>
+            </div>
+          </td>
+        </tr>
+      </ng-container>
+      <tr *ngIf="tasks().length === 0">
+        <td class="fx-td fx-empty" colspan="6">No messages.</td>
+      </tr>
+      </tbody>
+    </table>
+  </section>
+</div>

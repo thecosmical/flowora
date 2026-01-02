@@ -42,6 +42,7 @@ todayIso = () => new Date().toISOString().slice(0, 10);
     sku: string;
     name: string;
     category: string;
+    industry?: string;
     subCategory?: string;
     prevCode?: string;
     uom: string;
@@ -50,6 +51,7 @@ todayIso = () => new Date().toISOString().slice(0, 10);
     hsnSac?: string;
     reorderMinQty?: number;
     reorderQty?: number;
+    safetyStockByLocation?: Record<string, number>;
     shelfLifeDays?: number;
     batchType?: string;
     importance?: string;
@@ -73,6 +75,7 @@ todayIso = () => new Date().toISOString().slice(0, 10);
       sku: payload.sku,
       name: payload.name,
       category: payload.category,
+      industry: payload.industry,
       subCategory: payload.subCategory,
       prevCode: payload.prevCode,
       uom: payload.uom,
@@ -81,6 +84,7 @@ todayIso = () => new Date().toISOString().slice(0, 10);
       hsnSac: payload.hsnSac,
       reorderMinQty: payload.reorderMinQty,
       reorderQty: payload.reorderQty,
+      safetyStockByLocation: payload.safetyStockByLocation,
       shelfLifeDays: payload.shelfLifeDays,
       batchType: payload.batchType,
       importance: payload.importance ?? 'Normal',
@@ -150,10 +154,22 @@ if (scope.mode === 'ALL') return s;
   isExpired = (dateIso: string) => dateIso < this.todayIso();
 
   lowStockInScope = (item: Item) => {
-    const min = item.reorderMinQty ?? 0;
+    const min = this.minForItemInScope(item);
     if (min <= 0) return false;
     return this.qtyForItemInScope(item.id) < min;
   };
+
+  minForItemInScope(item: Item) {
+    const scope = this.scope();
+    const byLoc = item.safetyStockByLocation ?? {};
+    if (scope.mode === 'ONE') {
+      const val = byLoc[scope.locationId];
+      return Number.isFinite(val) ? val : item.reorderMinQty ?? 0;
+    }
+    const perLocationMin = Object.values(byLoc).reduce((sum, v) => (Number.isFinite(v) ? sum + v : sum), 0);
+    if (perLocationMin > 0) return perLocationMin;
+    return item.reorderMinQty ?? 0;
+  }
 
   stockByLocationForItem = (itemId: string) => {
     const rows = this._stock().filter(r => r.itemId === itemId);
@@ -190,4 +206,19 @@ if (scope.mode === 'ALL') return s;
       .filter(x => x.batch)
       .sort((a, b) => (a.batch!.expiryDate).localeCompare(b.batch!.expiryDate));
   };
+
+  addStock(itemId: string, qty: number) {
+    if (!Number.isFinite(qty) || qty === 0) return;
+    const primaryLoc = this._locations()[0] ?? this.addLocation('Main Store');
+    const batchId = '';
+    this._stock.update(rows => {
+      const existing = rows.find(r => r.itemId === itemId && r.locationId === primaryLoc.id && r.batchId === batchId);
+      if (existing) {
+        return rows.map(r =>
+          r === existing ? { ...r, qty: r.qty + qty } : r
+        );
+      }
+      return [{ itemId, locationId: primaryLoc.id, batchId, qty }, ...rows];
+    });
+  }
 }

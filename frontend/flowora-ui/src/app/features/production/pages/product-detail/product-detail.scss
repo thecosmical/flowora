@@ -2,6 +2,7 @@
 .card { border:1px solid var(--border-soft); border-radius:12px; padding:12px; background:#fff; }
 .label { color: var(--ink-500); font-size:12px; }
 .value { font-weight:700; margin-top:4px; }
+.value.warn { color: #c56618; }
 .filter-row { margin-bottom: 12px; }
 .filter-row label { display:flex; gap:8px; align-items:center; font-size:13px; color: var(--ink-500); }
 .filter-row select { padding:8px 10px; border:1px solid var(--border-soft); border-radius:10px; }

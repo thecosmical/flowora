@@ -1,21 +1,24 @@
 import { StockRow } from './inventory.models';
 
 export const STOCK: StockRow[] = [
-{ itemId: 'IT-1', locationId: 'LOC-1', batchId: 'B-1', qty: 60 },
-{ itemId: 'IT-1', locationId: 'LOC-1', batchId: 'B-2', qty: 10 },
-{ itemId: 'IT-1', locationId: 'LOC-3', batchId: 'B-1', qty: 40 },
+  { itemId: 'IT-STEEL-315', locationId: 'LOC-1', batchId: 'B-STL-01', qty: 3200 },
+  { itemId: 'IT-STEEL-315', locationId: 'LOC-2', batchId: 'B-STL-02', qty: 2100 },
 
-{ itemId: 'IT-2', locationId: 'LOC-2', batchId: 'B-3', qty: 18 },
-{ itemId: 'IT-2', locationId: 'LOC-2', batchId: 'B-4', qty: 6 },
+  { itemId: 'IT-FOOT-RING', locationId: 'LOC-1', batchId: 'B-FR-01', qty: 420 },
+  { itemId: 'IT-FOOT-RING', locationId: 'LOC-2', batchId: 'B-FR-02', qty: 260 },
 
-{ itemId: 'IT-3', locationId: 'LOC-1', batchId: 'B-5', qty: 120 },
-{ itemId: 'IT-3', locationId: 'LOC-3', batchId: 'B-5', qty: 90 },
+  { itemId: 'IT-VALVE-SET', locationId: 'LOC-1', batchId: 'B-VLV-01', qty: 650 },
+  { itemId: 'IT-VALVE-SET', locationId: 'LOC-2', batchId: 'B-VLV-02', qty: 420 },
 
-{ itemId: 'IT-4', locationId: 'LOC-1', batchId: 'B-5', qty: 10 },
+  { itemId: 'IT-GUARD-RING', locationId: 'LOC-1', batchId: 'B-GRD-01', qty: 380 },
+  { itemId: 'IT-RING-SHOULDER', locationId: 'LOC-1', batchId: 'B-SHL-01', qty: 310 },
 
-{ itemId: 'IT-5', locationId: 'LOC-4', batchId: 'B-6', qty: 8 },
-{ itemId: 'IT-5', locationId: 'LOC-4', batchId: 'B-7', qty: 14 },
+  { itemId: 'IT-WELD-12', locationId: 'LOC-1', batchId: 'B-WELD-01', qty: 540 },
+  { itemId: 'IT-WELD-12', locationId: 'LOC-2', batchId: 'B-WELD-02', qty: 360 },
 
-{ itemId: 'IT-6', locationId: 'LOC-2', batchId: 'B-8', qty: 22 },
-{ itemId: 'IT-6', locationId: 'LOC-2', batchId: 'B-9', qty: 70 }
+  { itemId: 'IT-PAINT-GRAY', locationId: 'LOC-3', batchId: 'B-PNT-01', qty: 220 },
+  { itemId: 'IT-PAINT-RED', locationId: 'LOC-3', batchId: 'B-PNT-02', qty: 180 },
+
+  { itemId: 'IT-NAME-PLATE', locationId: 'LOC-1', batchId: 'B-NP-01', qty: 900 },
+  { itemId: 'IT-HYDRO-PLUG', locationId: 'LOC-3', batchId: 'B-HYD-01', qty: 60 }
 ];

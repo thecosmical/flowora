@@ -1,19 +1,37 @@
-<header class="fx-topbar">
-  <section class="fx-topbar-inner">
-    <div class="fx-brand">Flowora Control</div>
+<div class="fx-shell solo">
+  <header class="fx-topbar">
+    <div class="fx-topbar-inner">
+      <div class="brand-block">
+        <div class="fx-brand">
+          <span class="brand-mark">OpsControl</span>
+        </div>
+        <div class="brand-tagline">We run your operations, you run the business.</div>
+      </div>
+      <nav class="fx-crumbs">
+        <a routerLink="/home" routerLinkActive="active">Home</a>
+        <a routerLink="/inventory" routerLinkActive="active">Inventory</a>
+        <a routerLink="/production/requests" routerLinkActive="active">Requests</a>
+        <a routerLink="/notifications" routerLinkActive="active">Notifications</a>
+        <a routerLink="/audit" routerLinkActive="active">Audit</a>
+      </nav>
+      <div class="fx-spacer"></div>
+      <div class="fx-user-actions">
+        <button class="fx-btn ghost small" type="button">Login</button>
+        <button class="fx-btn ghost small" type="button">Settings</button>
+        <button class="fx-btn ghost small" type="button">About</button>
+      </div>
+      <span class="fx-badge">DEV</span>
+    </div>
+  </header>
 
-    <nav class="fx-nav">
-      <a routerLink="/home" routerLinkActive="active">Home</a>
-      <a routerLink="/inventory" routerLinkActive="active">Inventory</a>
-      <a routerLink="/production/requests" routerLinkActive="active">Requests</a>
-    </nav>
+  <main class="fx-main">
+    <router-outlet></router-outlet>
+  </main>
 
-    <div class="fx-spacer"></div>
-
-    <span class="fx-badge">DEV</span>
-  </section>
-</header>
-
-<main class="fx-main">
-  <router-outlet></router-outlet>
-</main>
+  <footer class="fx-footer">
+    <div class="fx-footer-inner">
+      <div class="footer-brand">OpsControl</div>
+      <div class="footer-tagline">You serve customers. We run the operations.</div>
+    </div>
+  </footer>
+</div>

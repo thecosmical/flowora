@@ -1,43 +1,68 @@
 <div class="home">
   <section class="hero">
-    <div>
-      <p class="eyebrow">Flowora Control</p>
-      <h1>We handle the ops headaches. You focus on customers.</h1>
+    <div class="hero-copy">
+      <div class="eyebrow">OpsControl</div>
+      <h1 class="hero-title">Approvals, accountability, and inventory in one place.</h1>
       <p class="lead">
-        Bring your business plan; Flowora Control shoulders the inventory, purchasing, and resolution chores so you can ship better products and care for buyers.
+        Reorder smarter, stay in budget, and keep every action owned and audit-ready. Real-time alerts to approve, reject, or close work—so you mind your customers, we mind your operations.
+        We’ll watch the operations; you run the business.
       </p>
-      <div class="cta-row">
-        <a routerLink="/inventory" class="btn primary">Open Inventory Workspace</a>
-        <a routerLink="/production/requests" class="btn ghost">Requests & Approvals</a>
+      <div class="action-bar">
+        <!-- <a class="fx-btn" routerLink="/inventory">Open Inventory Workspace</a>
+        <a class="fx-btn ghost" routerLink="/production/requests">Requests &amp; Approvals</a>
+        <a class="fx-btn ghost" routerLink="/notifications">Alerts</a> -->
       </div>
       <div class="kpi-row">
-        <span class="kpi">15 min onboarding</span>
-        <span class="kpi">99.5% batch accuracy</span>
-        <span class="kpi">1-click request routing</span>
+        <div class="kpi">
+          <div class="glyph">⏱</div>
+          <div><strong>15 min</strong><span>Onboarding</span></div>
+        </div>
+        <div class="kpi">
+          <div class="glyph">✔</div>
+          <div><strong>99.5%</strong><span>Batch accuracy</span></div>
+        </div>
+        <div class="kpi">
+          <div class="glyph">⚡</div>
+          <div><strong>1-click</strong><span>Routing</span></div>
+        </div>
       </div>
     </div>
   </section>
 
   <section class="grid">
     <article class="card">
-      <div class="pill">Owners & Storekeepers</div>
-      <h3>Track stock in one place</h3>
-      <p>See SKUs, HSN/SAC, batches, and expiry across locations with FEFO-ready insights.</p>
+      <div class="pill">Inventory</div>
+      <h3>Track stock &amp; expiry</h3>
+      <p>Scope by location, earliest-expiry batches, and per-location safety stock with live risk tags.</p>
       <a routerLink="/inventory" class="link">Open Inventory →</a>
     </article>
 
     <article class="card">
-      <div class="pill">Ops & Procurement</div>
+      <div class="pill">Requests</div>
       <h3>Request → Approve → Issue</h3>
-      <p>Role-based approvals, inline reasons, and WIP tracking for every production or purchase request.</p>
+      <p>Role-based approvals, inline reasons, and WIP tracking for production or purchase.</p>
       <a routerLink="/production/requests" class="link">Open Requests →</a>
     </article>
 
     <article class="card">
-      <div class="pill">Quality & Compliance</div>
-      <h3>Batch + expiry discipline</h3>
-      <p>Mark expirable items, store HSN/GST, and capture notes for audits and customer docs.</p>
+      <div class="pill">Quality</div>
+      <h3>QA-ready data</h3>
+      <p>HSN/GST, batch expiry, and notes ready for audits and customer docs.</p>
       <a routerLink="/inventory" class="link">Review batches →</a>
+    </article>
+
+    <article class="card">
+      <div class="pill">Alerts</div>
+      <h3>Notification Center</h3>
+      <p>Assigned tasks and reminders with due dates, status, and SLA breach highlights.</p>
+      <a routerLink="/notifications" class="link">Open Alerts →</a>
+    </article>
+
+    <article class="card">
+      <div class="pill">Audit</div>
+      <h3>Audit-ready log</h3>
+      <p>Read-only record of approvals, stock updates, and tasks across entities.</p>
+      <a routerLink="/audit" class="link">View Audit →</a>
     </article>
   </section>
 </div>

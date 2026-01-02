@@ -1,0 +1,35 @@
+{
+  "tasks": [
+    {
+      "id": "TASK-STEEL-SPLIT",
+      "itemId": "IT-STEEL-315",
+      "title": "Split coil STL-315 into blanks",
+      "qty": 1500,
+      "status": "PENDING",
+      "dueDate": "2024-12-22",
+      "createdAt": "2024-12-18T10:00:00Z",
+      "assignee": "Stores Team"
+    },
+    {
+      "id": "TASK-QA-PLUG",
+      "itemId": "IT-HYDRO-PLUG",
+      "title": "Hydro plugs calibration & issue",
+      "qty": 10,
+      "status": "BREACHED",
+      "dueDate": "2024-12-17",
+      "createdAt": "2024-12-15T08:00:00Z",
+      "assignee": "QA Desk",
+      "reason": "Awaiting water line clearance"
+    },
+    {
+      "id": "TASK-VALVE-REC",
+      "itemId": "IT-VALVE-SET",
+      "title": "Receive valve+bung sets - QA sample 10%",
+      "qty": 200,
+      "status": "RECEIVED",
+      "dueDate": "2024-12-25",
+      "createdAt": "2024-12-18T12:00:00Z",
+      "assignee": "Maintenance"
+    }
+  ]
+}

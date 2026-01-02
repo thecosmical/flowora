@@ -7,7 +7,7 @@ export type User = { name: string; role: UserRole };
 export class UserContextService {
   readonly users: User[] = [
     { name: 'Rahul (Ops)', role: 'OPS_MANAGER' },
-    { name: 'Anita (CEO)', role: 'CEO' },
+    { name: 'Tarun (CEO)', role: 'CEO' },
     { name: 'Vikram (Procurement)', role: 'PROCUREMENT' }
   ];
 

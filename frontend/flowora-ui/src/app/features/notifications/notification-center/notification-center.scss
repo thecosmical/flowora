@@ -1,0 +1,8 @@
+.detail-card { background: #fdfefe; border: 1px solid var(--border-soft); border-radius: 12px; padding: 12px; box-shadow: var(--shadow-xs); display: grid; gap: 10px; }
+.detail-row { display: flex; gap: 12px; flex-wrap: wrap; font-size: 13px; }
+.detail-actions { display: flex; gap: 10px; }
+.fx-pill.pending { background:#fff4e5; border-color:#f4dcb5; color:#c56618; }
+.fx-pill.received { background:#edf2fb; border-color:#c7d7f5; color:#335a9f; }
+.fx-pill.completed { background:#e7f5ec; border-color:#bee3cc; color:#1c7c3a; }
+.fx-pill.rejected { background:#fde5e1; border-color:#f3b0b0; color:#b42318; }
+.fx-pill.breached { background:#fde5e1; border-color:#f3b0b0; color:#b42318; }

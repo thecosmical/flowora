@@ -1,0 +1,76 @@
+{
+  "products": [
+    { "id": "FG-LPG-15KG", "name": "LPG Cylinder 15kg Domestic", "sku": "FG-LPG-15", "status": "ACTIVE", "uom": "unit", "category": "Finished Goods", "description": "15kg domestic LPG cylinder (ISI)." },
+    { "id": "FG-LPG-33KG", "name": "LPG Cylinder 33kg Commercial", "sku": "FG-LPG-33", "status": "ACTIVE", "uom": "unit", "category": "Finished Goods", "description": "33kg commercial LPG cylinder." },
+    { "id": "FG-FE-9KG", "name": "Fire Extinguisher Shell 9kg", "sku": "FG-FE-9", "status": "ACTIVE", "uom": "unit", "category": "Finished Goods", "description": "CO2 / dry-chem extinguisher shell 9kg." },
+    { "id": "FG-AIR-1000L", "name": "Air Receiver 1000L", "sku": "FG-AIR-1000", "status": "ACTIVE", "uom": "unit", "category": "Finished Goods", "description": "1000L pressure vessel / air receiver." },
+    { "id": "FG-SOLAR-200L", "name": "Solar Water Heater Tank 200L", "sku": "FG-SOLAR-200", "status": "ACTIVE", "uom": "unit", "category": "Finished Goods", "description": "200L solar water heater storage tank." }
+  ],
+  "requests": [
+    {
+      "id": "REQ-LPG-001",
+      "productId": "FG-LPG-15KG",
+      "type": "ISSUE",
+      "requestedBy": "Ananya (Ops Lead)",
+      "requestedByRole": "OPS_MANAGER",
+      "approvers": ["Rahul (Ops Head)", "Tarun (CEO)"],
+      "approvedBy": ["Tarun (CEO)"],
+      "approvals": [{ "by": "Tarun (CEO)", "role": "CEO", "at": "2024-12-15T12:00:00Z", "comment": "Build batch of 150 units" }],
+      "status": "APPROVED",
+      "targetQty": 150,
+      "createdAt": "2024-12-14T10:00:00Z",
+      "approvedAt": "2024-12-15T12:00:00Z",
+      "docs": [{ "id": "DOC-1", "name": "Issue Note #VANSH-45", "docType": "OTHER" }]
+    },
+    {
+      "id": "REQ-LPG-002",
+      "productId": "FG-LPG-33KG",
+      "type": "ISSUE",
+      "requestedBy": "Megha (QA)",
+      "requestedByRole": "OPS_MANAGER",
+      "approvers": ["Tarun (CEO)"],
+      "approvedBy": [],
+      "approvals": [],
+      "status": "PENDING",
+      "targetQty": 60,
+      "createdAt": "2024-12-20T09:00:00Z",
+      "docs": [{ "id": "DOC-2", "name": "Batch Plan 33kg", "docType": "OTHER" }]
+    },
+    {
+      "id": "REQ-FG-003",
+      "productId": "FG-FE-9KG",
+      "type": "ISSUE",
+      "requestedBy": "Vikram (Production)",
+      "requestedByRole": "OPS_MANAGER",
+      "approvers": ["Rahul (Ops Head)"],
+      "approvedBy": ["Rahul (Ops Head)"],
+      "approvals": [{ "by": "Rahul (Ops Head)", "role": "OPS_MANAGER", "at": "2024-12-12T09:00:00Z", "comment": "Shell line ready" }],
+      "status": "APPROVED",
+      "targetQty": 200,
+      "createdAt": "2024-12-12T08:00:00Z",
+      "docs": [{ "id": "DOC-3", "name": "Shell Schedule FE-9", "docType": "OTHER" }]
+    }
+  ],
+  "lines": [
+    { "requestId": "REQ-LPG-001", "itemId": "IT-STEEL-315", "requestedQty": 3200, "approvedQty": 3200, "usedQty": 1800, "returnedQty": 0, "rejectedQty": 0, "reason": "Shells + foot ring blanks", "notes": "Balance reserved for rework" },
+    { "requestId": "REQ-LPG-001", "itemId": "IT-FOOT-RING", "requestedQty": 200, "approvedQty": 200, "usedQty": 160, "returnedQty": 10, "rejectedQty": 0 },
+    { "requestId": "REQ-LPG-001", "itemId": "IT-VALVE-SET", "requestedQty": 180, "approvedQty": 180, "usedQty": 150, "returnedQty": 20, "rejectedQty": 10, "reason": "10 valves failed QA" },
+    { "requestId": "REQ-LPG-002", "itemId": "IT-STEEL-315", "requestedQty": 1800, "approvedQty": 0, "usedQty": 0, "returnedQty": 0, "rejectedQty": 0, "notes": "Pending lead approval" },
+    { "requestId": "REQ-LPG-002", "itemId": "IT-GUARD-RING", "requestedQty": 120, "approvedQty": 0, "usedQty": 0, "returnedQty": 0, "rejectedQty": 0 },
+    { "requestId": "REQ-FG-003", "itemId": "IT-STEEL-315", "requestedQty": 900, "approvedQty": 900, "usedQty": 540, "returnedQty": 0, "rejectedQty": 0 },
+    { "requestId": "REQ-FG-003", "itemId": "IT-PAINT-RED", "requestedQty": 120, "approvedQty": 120, "usedQty": 90, "returnedQty": 0, "rejectedQty": 30, "reason": "Line swapped to grey for QA lot" },
+    { "requestId": "REQ-FG-003", "itemId": "IT-WELD-12", "requestedQty": 140, "approvedQty": 140, "usedQty": 110, "returnedQty": 10, "rejectedQty": 0 }
+  ],
+  "events": [
+    { "id": "EVT-1", "requestId": "REQ-LPG-001", "itemId": "IT-STEEL-315", "kind": "USED", "qty": 1200, "by": "Ananya (Ops Lead)", "at": "2024-12-15T14:00:00Z" },
+    { "id": "EVT-2", "requestId": "REQ-LPG-001", "itemId": "IT-VALVE-SET", "kind": "USED", "qty": 100, "by": "Ananya (Ops Lead)", "at": "2024-12-16T10:00:00Z" },
+    { "id": "EVT-3", "requestId": "REQ-LPG-001", "itemId": "IT-VALVE-SET", "kind": "REJECTED", "qty": 10, "reason": "Seat leak", "by": "QA Desk", "at": "2024-12-16T11:00:00Z" },
+    { "id": "EVT-4", "requestId": "REQ-LPG-001", "itemId": "IT-FOOT-RING", "kind": "RETURNED", "qty": 10, "reason": "Excess issued", "by": "Line-1 Supervisor", "at": "2024-12-16T12:00:00Z" },
+    { "id": "EVT-5", "requestId": "REQ-FG-003", "itemId": "IT-PAINT-RED", "kind": "REJECTED", "qty": 30, "reason": "Switched shade for QA lot", "by": "QA Desk", "at": "2024-12-12T15:00:00Z" },
+    { "id": "EVT-6", "requestId": "REQ-LPG-001", "itemId": "IT-WELD-12", "kind": "USED", "qty": 60, "by": "Line-1 Supervisor", "at": "2024-12-16T15:00:00Z" }
+  ],
+  "approvalRules": [
+    { "type": "ISSUE", "roles": ["OPS_MANAGER"] },
+    { "type": "PURCHASE", "minAmount": 0, "roles": ["OPS_MANAGER", "CEO"] }
+  ]
+}

@@ -6,29 +6,35 @@
         <div class="fx-sub">Requested → Approved → Used/Returned/Rejected, with approvers.</div>
       </div>
       <div class="fx-head-actions">
-        <a class="fx-btnlink fx-btn-ghost" routerLink="/production/request/new">+ New Request</a>
+        <a class="fx-btn ghost small" routerLink="/production/request/new">+ New Request</a>
       </div>
     </div>
 
-    <div class="fx-row" style="margin-top:14px;">
-      <input class="fx-input" placeholder="Search request / product / requester"
-             [value]="q()" (input)="q.set(($any($event.target)).value)" />
+    <div class="fx-row filters">
+      <label class="fx-input-group">
+        <span>Search request / product / requester</span>
+        <input class="fx-input" [value]="q()" (input)="q.set(($any($event.target)).value)" placeholder="Search..." />
+      </label>
 
-      <select class="fx-select" [value]="status()" (change)="status.set(($any($event.target)).value)">
-        <option value="ALL">All status</option>
-        <option value="PENDING">Pending</option>
-        <option value="APPROVED">Approved</option>
-        <option value="REJECTED">Rejected</option>
-        <option value="CLOSED">Closed</option>
-      </select>
+      <label class="fx-input-group">
+        <span>Status</span>
+        <select class="fx-select" [value]="status()" (change)="status.set($any($event.target).value)">
+          <option value="ALL">All status</option>
+          <option value="PENDING">Pending</option>
+          <option value="APPROVED">Approved</option>
+          <option value="REJECTED">Rejected</option>
+          <option value="CLOSED">Closed</option>
+        </select>
+      </label>
 
-      <select class="fx-select" [value]="type()" (change)="type.set(($any($event.target)).value)">
-        <option value="ALL">All types</option>
-        <option value="ISSUE">Inventory Issue</option>
-        <option value="PURCHASE">Purchase</option>
-      </select>
-
-      <div class="fx-spacer"></div>
+      <label class="fx-input-group">
+        <span>Type</span>
+        <select class="fx-select" [value]="type()" (change)="type.set($any($event.target).value)">
+          <option value="ALL">All types</option>
+          <option value="ISSUE">Inventory Issue</option>
+          <option value="PURCHASE">Purchase</option>
+        </select>
+      </label>
     </div>
 
     <table class="fx-table">
@@ -65,10 +71,23 @@
             <span class="fx-pill">{{ r.approvers.join(', ') }}</span>
           </td>
           <td class="fx-td fx-num">
-            <button class="pill-btn" type="button" (click)="toggle(r.id)" [attr.aria-expanded]="openId() === r.id">
-              <span class="fx-pill" [ngClass]="r.status.toLowerCase()">{{ r.status }}</span>
-              <span class="chevron">{{ openId() === r.id ? '▲' : '▼' }}</span>
+            <span class="fx-pill" [ngClass]="r.status.toLowerCase()">
+              {{ r.status }}
+            </span>
+          </td>
+          <td class="fx-td fx-num">
+            <button class="fx-btn ghost small" type="button" (click)="toggle(r.id)" [attr.aria-expanded]="openId() === r.id">
+              {{ openId() === r.id ? 'Hide' : 'Details' }}
             </button>
+          </td>
+        </tr>
+        <tr class="fx-tr summary-row" *ngIf="openId() === r.id">
+          <td class="fx-td" colspan="11">
+            <div class="summary-line">
+              <span class="fx-pill" [ngClass]="variance(r) === 0 ? 'ok' : 'warn'">
+                Variance: {{ variance(r) }}
+              </span>
+            </div>
           </td>
         </tr>
         <tr class="fx-detail" *ngIf="openId() === r.id">
@@ -77,7 +96,7 @@
               <div class="detail-row">
                 <div><strong>Requested By:</strong> {{ r.requestedBy }}</div>
                 <div><strong>Approved By:</strong> {{ r.approvedBy?.join(', ') || 'Pending' }}</div>
-                <div><strong>Docs:</strong> {{ r.docs?.join(' • ') || 'Placeholder' }} <button class="link" type="button">Attach (placeholder)</button></div>
+                <div><strong>Docs:</strong> {{ r.docs?.join(' • ') || 'Placeholder' }}</div>
               </div>
               <div class="detail-row">
                 <div><strong>Totals:</strong> Used {{ r.totals.used }} • Returned {{ r.totals.returned }} • Rejected {{ r.totals.rejected }}</div>
@@ -86,12 +105,17 @@
               <div class="lines">
                 <div class="line-head">Lines</div>
                 <div class="line-row" *ngFor="let l of r.lines">
-                  <span class="mono">{{ l.itemId }}</span>
+                  <div class="line-item">
+                    <div class="mono">{{ itemSku(l.itemId) }}</div>
+                    <div>{{ itemName(l.itemId) }}</div>
+                  </div>
                   <span>Req {{ l.requestedQty }}</span>
                   <span>App {{ l.approvedQty }}</span>
                   <span>Used {{ l.usedQty }}</span>
                   <span>Ret {{ l.returnedQty }}</span>
                   <span>Rej {{ l.rejectedQty }}</span>
+                  <span>Stock {{ itemStock(l.itemId) }}</span>
+                  <span class="reason">Δ {{ l.approvedQty - l.usedQty - l.returnedQty - l.rejectedQty }}</span>
                   <span class="reason">{{ l.reason || '' }}</span>
                 </div>
               </div>
@@ -101,6 +125,7 @@
                   <span class="pill" [ngClass]="e.kind.toLowerCase()">{{ e.kind }}</span>
                   <span class="mono">{{ e.at }}</span>
                   <span>{{ e.by }}</span>
+                  <span>{{ itemName(e.itemId) }}</span>
                   <span>{{ e.qty }}</span>
                   <span class="reason">{{ e.reason || '' }}</span>
                 </div>

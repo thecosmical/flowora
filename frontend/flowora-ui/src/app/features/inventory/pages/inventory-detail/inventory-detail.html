@@ -3,7 +3,7 @@
     <div>
       <div class="sku">{{ it.sku }}</div>
       <h2>{{ it.name }}</h2>
-      <div class="meta">{{ it.category }} • {{ it.uom }} • {{ it.status }}</div>
+      <div class="meta">{{ it.category }} • {{ it.industry || 'Industry N/A' }} • {{ it.uom }} • {{ it.status }}</div>
     </div>
 
     <div class="cta">
@@ -39,7 +39,7 @@
     </div>
 
     <div class="block">
-      <h3>Stock by Batch (FEFO)</h3>
+    <h3>Stock by Batch (earliest-expiry first)</h3>
       <div class="row head"><div>Batch</div><div>Expiry</div><div class="num">Qty</div><div>Risk</div></div>
       <div class="row" *ngFor="let r of byBatch()">
         <div class="mono">{{ r.batch?.batchNumber }}</div>

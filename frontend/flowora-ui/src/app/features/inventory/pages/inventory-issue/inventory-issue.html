@@ -16,7 +16,7 @@
     </label>
 
     <label>
-      Batch (FEFO)
+      Batch (earliest expiry)
       <select
         [value]="(selectedBatchId() ?? defaultBatchId())"
         (change)="selectedBatchId.set(($any($event.target)).value)"
@@ -47,7 +47,7 @@
   <button class="btn" [disabled]="!!error()" (click)="onSubmit()">Submit (UI only)</button>
 
   <div class="hint">
-    FEFO suggestion auto-picks earliest-expiring batch with stock. Expired batch is blocked.
+    Suggestion picks the earliest-expiring batch with stock. Expired batch is blocked.
   </div>
 </section>
 

@@ -1,0 +1,42 @@
+{
+  "roles": [
+    {
+      "id": "CEO",
+      "name": "CEO",
+      "description": "Full approval and override rights",
+      "permissions": ["inventory:read", "inventory:write", "requests:approve", "requests:reject", "tasks:update", "audit:read"]
+    },
+    {
+      "id": "OPS_MANAGER",
+      "name": "Operations Manager",
+      "description": "Create/approve requests, manage stock movements",
+      "permissions": ["inventory:read", "inventory:write", "requests:create", "requests:approve", "tasks:update"]
+    },
+    {
+      "id": "PROCUREMENT",
+      "name": "Procurement",
+      "description": "Purchase requests, vendor follow-ups",
+      "permissions": ["inventory:read", "requests:create", "requests:read", "tasks:update"]
+    },
+    {
+      "id": "QA",
+      "name": "Quality Assurance",
+      "description": "QA checks and task SLAs",
+      "permissions": ["inventory:read", "tasks:update", "audit:read"]
+    },
+    {
+      "id": "STORES",
+      "name": "Stores",
+      "description": "GRN, issues, transfers",
+      "permissions": ["inventory:read", "inventory:write", "tasks:update"]
+    }
+  ],
+  "industries": [
+    { "id": "manufacturing", "name": "Manufacturing" },
+    { "id": "pharma", "name": "Pharma" },
+    { "id": "retail", "name": "Retail" },
+    { "id": "ecom", "name": "E-Commerce" },
+    { "id": "automotive", "name": "Automotive" },
+    { "id": "energy", "name": "Energy" }
+  ]
+}
