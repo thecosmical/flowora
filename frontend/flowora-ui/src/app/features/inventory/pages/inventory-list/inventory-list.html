@@ -55,6 +55,7 @@
         <th class="fx-th">SKU</th>
         <th class="fx-th">Name</th>
         <th class="fx-th">Category</th>
+        <th class="fx-th">HSN/SAC</th>
         <th class="fx-th fx-num">Stock</th>
         <th class="fx-th">Earliest Expiry</th>
         <th class="fx-th">Status</th>
@@ -68,6 +69,7 @@
         <td class="fx-td fx-mono">{{ r.item.sku }}</td>
         <td class="fx-td">{{ r.item.name }}</td>
         <td class="fx-td">{{ r.item.category }}</td>
+        <td class="fx-td fx-mono">{{ r.item.hsnSac ?? '-' }}</td>
         <td class="fx-td fx-num">{{ r.qty }}</td>
         <td class="fx-td fx-mono">{{ r.earliest ?? '-' }}</td>
         <td class="fx-td">{{ r.item.status }}</td>
@@ -83,7 +85,7 @@
       </tr>
 
       <tr *ngIf="rows().length === 0">
-        <td class="fx-td fx-empty" colspan="8">No items match filters.</td>
+        <td class="fx-td fx-empty" colspan="9">No items match filters.</td>
       </tr>
       </tbody>
     </table>

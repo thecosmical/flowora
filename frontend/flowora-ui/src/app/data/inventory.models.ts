@@ -11,6 +11,7 @@ category: string;
 uom: string;
 trackingType: TrackingType;
 status: Status;
+hsnSac?: string;
 reorderMinQty?: number;
 reorderQty?: number;
 shelfLifeDays?: number;
