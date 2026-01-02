@@ -1,0 +1,18 @@
+.grid { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 12px; margin-top: 12px; }
+label { display: grid; gap: 6px; }
+label span { font-size: 12px; color: var(--ink-500); }
+input, select { padding: 10px 12px; border: 1px solid var(--border-soft); border-radius: 10px; }
+.approvers { margin-top: 12px; display: grid; gap: 8px; }
+.chips { display: flex; gap: 8px; flex-wrap: wrap; }
+.pill { border: 1px solid var(--border-soft); border-radius: 999px; padding: 8px 12px; background: #f9fafb; cursor: pointer; }
+.pill.active { border-color: var(--brand-primary); color: var(--brand-primary); background: rgba(15, 125, 165, 0.08); }
+.line { display: grid; grid-template-columns: 2fr 1fr 2fr auto; gap: 8px; align-items: center; }
+.btn { text-decoration: none; padding: 10px 12px; border-radius: 12px; border: 1px solid var(--border-soft); background: var(--brand-primary); color: #fff; cursor: pointer; }
+.ghost { background: #fff; color: var(--ink-900); }
+.add-reason { display: flex; gap: 8px; align-items: center; margin-top: 10px; }
+.add-reason input { flex: 1; }
+
+@media (max-width: 900px) {
+  .grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
+  .line { grid-template-columns: 1fr; }
+}

@@ -1,0 +1,88 @@
+<div class="fx-container" *ngIf="view() as v; else missing">
+  <section class="fx-card fx-pad">
+    <div class="fx-head">
+      <div>
+        <h2 class="fx-title">{{ v.product.name }}</h2>
+        <div class="fx-sub">{{ v.product.sku }} • {{ v.product.category }}</div>
+      </div>
+      <div class="fx-head-actions">
+        <a class="fx-btnlink fx-btn-ghost" routerLink="/production/requests">Requests</a>
+      </div>
+    </div>
+
+    <div class="filter-row">
+      <label>Status
+        <select [ngModel]="statusFilter()" (ngModelChange)="statusFilter.set($event)">
+          <option value="ALL">All</option>
+          <option value="PENDING">Pending</option>
+          <option value="APPROVED">Approved</option>
+          <option value="REJECTED">Rejected</option>
+          <option value="CLOSED">Closed</option>
+        </select>
+      </label>
+      <a class="fx-btnlink fx-btn-ghost" routerLink="/production/requests">Requests View</a>
+    </div>
+
+    <div class="cards">
+      <div class="card">
+        <div class="label">Approved Qty</div>
+        <div class="value">{{ v.totals.approved }}</div>
+      </div>
+      <div class="card">
+        <div class="label">Used</div>
+        <div class="value">{{ v.totals.used }}</div>
+      </div>
+      <div class="card">
+        <div class="label">Returned</div>
+        <div class="value">{{ v.totals.returned }}</div>
+      </div>
+      <div class="card">
+        <div class="label">Rejected</div>
+        <div class="value">{{ v.totals.rejected }}</div>
+      </div>
+    </div>
+
+    <h3>Requests</h3>
+    <table class="fx-table">
+      <thead>
+      <tr>
+        <th class="fx-th">Req ID</th>
+        <th class="fx-th">Type</th>
+        <th class="fx-th">Requested</th>
+        <th class="fx-th">Approved</th>
+        <th class="fx-th">Used</th>
+        <th class="fx-th">Returned</th>
+        <th class="fx-th">Rejected</th>
+        <th class="fx-th">Requested By</th>
+        <th class="fx-th">Approvers</th>
+        <th class="fx-th">Approved By</th>
+        <th class="fx-th">Status</th>
+        <th class="fx-th"></th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr class="fx-tr" *ngFor="let r of v.requests">
+        <td class="fx-td fx-mono">{{ r.id }}</td>
+        <td class="fx-td">{{ r.type === 'ISSUE' ? 'Inventory Issue' : 'Purchase' }}</td>
+        <td class="fx-td">{{ r.targetQty }}</td>
+        <td class="fx-td">{{ totalApproved(r.lines) }}</td>
+        <td class="fx-td">{{ r.totals.used }}</td>
+        <td class="fx-td">{{ r.totals.returned }}</td>
+        <td class="fx-td">{{ r.totals.rejected }}</td>
+        <td class="fx-td">{{ r.requestedBy }}</td>
+        <td class="fx-td">{{ r.approvers.join(', ') }}</td>
+        <td class="fx-td">{{ r.approvedBy?.join(', ') || 'Pending' }}</td>
+        <td class="fx-td">{{ r.status }}</td>
+        <td class="fx-td fx-num"><a class="fx-btnlink" [routerLink]="['/production/request', r.id]">View</a></td>
+      </tr>
+      <tr *ngIf="v.requests.length === 0">
+        <td class="fx-td fx-empty" colspan="12">No requests yet.</td>
+      </tr>
+      </tbody>
+    </table>
+  </section>
+</div>
+
+<ng-template #missing>
+  <div class="fx-container">Product not found.</div>
+</ng-template>

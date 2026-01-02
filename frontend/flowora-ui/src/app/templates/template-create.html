@@ -1,0 +1,73 @@
+<section class="wrap">
+  <header>
+    <div>
+      <p class="eyebrow">Template Studio</p>
+      <h1>Create a custom populate template</h1>
+      <p class="sub">Pre-fill the SKU form for your industry or product line.</p>
+    </div>
+    <div class="actions">
+      <a class="btn ghost" routerLink="/inventory/create">Back</a>
+      <button class="btn" (click)="save()">Save Template</button>
+    </div>
+  </header>
+
+  <div class="card">
+    <div class="grid two">
+      <label>
+        <span>Template Name *</span>
+        <input [ngModel]="form().templateName" (ngModelChange)="update('templateName', $event)" placeholder="My Retail Kit" />
+      </label>
+      <label>
+        <span>Importance</span>
+        <input [ngModel]="form().importance" (ngModelChange)="update('importance', $event)" />
+      </label>
+    </div>
+
+    <div class="grid three">
+      <label>
+        <span>Item Name *</span>
+        <input [ngModel]="form().name" (ngModelChange)="update('name', $event)" placeholder="LED Light 350W" />
+      </label>
+      <label>
+        <span>Code *</span>
+        <input [ngModel]="form().code" (ngModelChange)="update('code', $event)" placeholder="LL-1250" />
+      </label>
+      <label>
+        <span>Category</span>
+        <input [ngModel]="form().category" (ngModelChange)="update('category', $event)" placeholder="Lighting" />
+      </label>
+      <label>
+        <span>Sub-Category</span>
+        <input [ngModel]="form().subCategory" (ngModelChange)="update('subCategory', $event)" placeholder="Blue Shade" />
+      </label>
+      <label>
+        <span>Qty</span>
+        <input type="number" min="1" [ngModel]="form().qty" (ngModelChange)="update('qty', +$event)" />
+      </label>
+      <label>
+        <span>Unit</span>
+        <input [ngModel]="form().unit" (ngModelChange)="update('unit', $event)" />
+      </label>
+    </div>
+
+    <div class="types">
+      <span>Types</span>
+      <div class="chips">
+        <button
+          type="button"
+          class="pill"
+          [class.active]="form().types.has(t)"
+          *ngFor="let t of typeOptions"
+          (click)="toggleType(t)"
+        >
+          {{ t }}
+        </button>
+      </div>
+    </div>
+
+    <label>
+      <span>Tags (comma separated)</span>
+      <input [ngModel]="form().tags" (ngModelChange)="update('tags', $event)" placeholder="Retail, Lighting" />
+    </label>
+  </div>
+</section>

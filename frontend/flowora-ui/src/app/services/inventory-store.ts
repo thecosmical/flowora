@@ -1,5 +1,5 @@
 import { Injectable, computed, signal } from '@angular/core';
-import { Batch, Item, Location, Movement, StockRow } from '../data/inventory.models';
+import { Batch, Item, Location, Movement, Status, StockRow, TrackingType } from '../data/inventory.models';
 import { ITEMS } from '../data/mock.items';
 import { LOCATIONS } from '../data/mock.locations';
 import { BATCHES } from '../data/mock.batches';
@@ -26,9 +26,93 @@ readonly scope = signal<LocationScope>({ mode: 'ALL' });
 
 todayIso = () => new Date().toISOString().slice(0, 10);
 
-getItem = (id: string) => this._items().find(i => i.id === id) ?? null;
-getLocation = (id: string) => this._locations().find(l => l.id === id) ?? null;
-getBatch = (id: string) => this._batches().find(b => b.id === id) ?? null;
+  getItem = (id: string) => this._items().find(i => i.id === id) ?? null;
+  getLocation = (id: string) => this._locations().find(l => l.id === id) ?? null;
+  getBatch = (id: string) => this._batches().find(b => b.id === id) ?? null;
+
+  addLocation = (name: string, type: Location['type'] = 'WAREHOUSE') => {
+    const id = `LOC-${(this._locations().length + 1).toString().padStart(2, '0')}`;
+    const location: Location = { id, name, type, status: 'ACTIVE' };
+    this._locations.update(list => [...list, location]);
+    return location;
+  };
+
+  addItem = (payload: {
+    id: string;
+    sku: string;
+    name: string;
+    category: string;
+    subCategory?: string;
+    prevCode?: string;
+    uom: string;
+    trackingType?: TrackingType;
+    status?: Status;
+    hsnSac?: string;
+    reorderMinQty?: number;
+    reorderQty?: number;
+    shelfLifeDays?: number;
+    batchType?: string;
+    importance?: string;
+    types?: string[];
+    internalManufacturing?: boolean;
+    purchase?: boolean;
+    stdCost?: number;
+    purchaseCost?: number;
+    salePrice?: number;
+    gst?: number;
+    mrp?: number;
+    description?: string;
+    internalNotes?: string;
+    leadTimeDays?: number;
+    tags?: string[];
+    defaultStoreId?: string;
+    qty?: number;
+  }) => {
+    const item: Item = {
+      id: payload.id,
+      sku: payload.sku,
+      name: payload.name,
+      category: payload.category,
+      subCategory: payload.subCategory,
+      prevCode: payload.prevCode,
+      uom: payload.uom,
+      trackingType: payload.trackingType ?? 'BATCH_EXPIRY',
+      status: payload.status ?? 'ACTIVE',
+      hsnSac: payload.hsnSac,
+      reorderMinQty: payload.reorderMinQty,
+      reorderQty: payload.reorderQty,
+      shelfLifeDays: payload.shelfLifeDays,
+      batchType: payload.batchType,
+      importance: payload.importance ?? 'Normal',
+      types: payload.types ?? ['Products'],
+      internalManufacturing: payload.internalManufacturing ?? false,
+      purchase: payload.purchase ?? false,
+      stdCost: payload.stdCost,
+      purchaseCost: payload.purchaseCost,
+      salePrice: payload.salePrice,
+      gst: payload.gst,
+      mrp: payload.mrp,
+      description: payload.description,
+      internalNotes: payload.internalNotes,
+      leadTimeDays: payload.leadTimeDays,
+      tags: payload.tags ?? []
+    };
+
+    this._items.update(list => [item, ...list]);
+
+    const qty = Number(payload.qty ?? 0);
+    if (qty > 0) {
+      const currentScope = this.scope();
+      const primaryLoc = this._locations()[0] ?? this.addLocation('Main Store');
+      const locId =
+        payload.defaultStoreId ??
+        (currentScope.mode === 'ONE' ? currentScope.locationId : primaryLoc.id);
+      this._stock.update(rows => [
+        { itemId: item.id, locationId: locId, batchId: '', qty },
+        ...rows
+      ]);
+    }
+  };
 
 stockRowsInScope = computed(() => {
 const s = this._stock();

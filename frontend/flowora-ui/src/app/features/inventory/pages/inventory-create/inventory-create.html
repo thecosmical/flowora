@@ -1,43 +1,221 @@
 <section class="page">
-  <div class="header">
+  <header class="header">
     <div>
-      <h1>Create Inventory Item</h1>
-      <div class="sub">Dummy local store (no backend yet)</div>
+      <h1>Create SKU</h1>
+      <div class="sub">Mock create; will wire to APIs later.</div>
     </div>
-    <a class="btn ghost" routerLink="/inventory">Back</a>
-  </div>
+    <div class="actions">
+      <div class="populate">
+        <span>Add Populate:</span>
+        <select
+          [ngModel]="selectedTemplate()"
+          (ngModelChange)="selectedTemplate.set($event); populate($event)"
+        >
+          <option *ngFor="let t of templateOptions()" [value]="t">{{ t }}</option>
+        </select>
+      </div>
+      <a class="btn ghost" routerLink="/inventory">Back</a>
+      <button class="btn" [disabled]="!isValid()" (click)="onSubmit()">Save</button>
+    </div>
+  </header>
 
   <div class="card">
+    <div class="section-title">Identifiers</div>
+    <div class="grid">
+      <label title="Enter item name">
+        <span>Name *</span>
+        <input [ngModel]="form().name" (ngModelChange)="updateField('name', $event)" placeholder="LED Light 350W" />
+      </label>
+
+      <label title="Unique SKU/Code">
+        <span>Code *</span>
+        <input [ngModel]="form().code" (ngModelChange)="updateField('code', $event)" placeholder="LL1250" />
+      </label>
+
+      <label>
+        <span>Prev. Code</span>
+        <input [ngModel]="form().prevCode" (ngModelChange)="updateField('prevCode', $event)" placeholder="LL1250A" />
+      </label>
+    </div>
+
+    <div class="section-title">Classification</div>
     <div class="grid">
       <label>
-        <span>ID</span>
-        <input [(ngModel)]="id" placeholder="INV-2001" />
+        <span>Category *</span>
+        <div class="inline">
+          <select [ngModel]="form().category" (ngModelChange)="updateField('category', $event)">
+            <option value="" disabled>Select category</option>
+            <option *ngFor="let c of categoryOptions()" [value]="c">{{ c }}</option>
+          </select>
+          <input #newCat placeholder="New" />
+          <button type="button" class="small" (click)="onAddCategory(newCat.value)">+</button>
+        </div>
       </label>
 
       <label>
-        <span>Name</span>
-        <input [(ngModel)]="name" placeholder="Item name" />
+        <span>Sub-Category *</span>
+        <div class="inline">
+          <select [ngModel]="form().subCategory" (ngModelChange)="updateField('subCategory', $event)">
+            <option value="" disabled>Select sub-category</option>
+            <option *ngFor="let c of subCategoryOptions()" [value]="c">{{ c }}</option>
+          </select>
+          <input #newSub placeholder="New" />
+          <button type="button" class="small" (click)="onAddSubCategory(newSub.value)">+</button>
+        </div>
       </label>
 
       <label>
-        <span>SKU</span>
-        <input [(ngModel)]="sku" placeholder="SKU-XX" />
+        <span>Batch Type</span>
+        <select [ngModel]="form().batchType" (ngModelChange)="updateField('batchType', $event)">
+          <option value="">Select</option>
+          <option *ngFor="let b of batchTypes" [value]="b">{{ b }}</option>
+        </select>
+      </label>
+    </div>
+
+    <div class="section-title">Quantity & Storage</div>
+    <div class="grid">
+      <label>
+        <span>Qty *</span>
+        <input type="number" min="1" [ngModel]="form().qty" (ngModelChange)="updateField('qty', +$event)" />
       </label>
 
       <label>
-        <span>Quantity</span>
-        <input type="number" [(ngModel)]="quantity" />
+        <span>Unit *</span>
+        <select [ngModel]="form().unit" (ngModelChange)="updateField('unit', $event)">
+          <option *ngFor="let u of units" [value]="u">{{ u }}</option>
+        </select>
       </label>
 
-      <label class="wide">
-        <span>Location</span>
-        <input [(ngModel)]="location" placeholder="Dehradun WH-A" />
+      <label>
+        <span>Store *</span>
+        <div class="inline">
+          <select [ngModel]="form().storeId" (ngModelChange)="updateField('storeId', $event)">
+            <option value="" disabled>Select store</option>
+            <option *ngFor="let s of storeOptions()" [value]="s.id">{{ s.name }}</option>
+          </select>
+          <input #newStore placeholder="New store" />
+          <button type="button" class="small" (click)="onAddStore(newStore.value)">+</button>
+        </div>
+      </label>
+    </div>
+
+    <div class="section-title">Attributes</div>
+    <div class="grid">
+      <label>
+        <span>Importance</span>
+        <input [ngModel]="form().importance" (ngModelChange)="updateField('importance', $event)" />
+      </label>
+
+      <label>
+        <span>Types *</span>
+        <div class="chips">
+          <button
+            type="button"
+            class="pill"
+            [class.active]="form().types.has(t)"
+            *ngFor="let t of typeOptions"
+            (click)="toggleType(t)"
+          >
+            {{ t }}
+          </button>
+        </div>
+      </label>
+
+      <label class="flags">
+        <span>Flags</span>
+        <div class="checks">
+          <label>
+            <input type="checkbox" [checked]="form().internalManufacturing" (change)="updateField('internalManufacturing', ($any($event.target)).checked)" />
+            Internal Manufacturing
+          </label>
+          <label>
+            <input type="checkbox" [checked]="form().purchase" (change)="updateField('purchase', ($any($event.target)).checked)" />
+            Purchase
+          </label>
+        </div>
+      </label>
+    </div>
+
+    <div class="section-title">Pricing</div>
+    <div class="grid">
+      <label>
+        <span>Std. Cost</span>
+        <input type="number" min="0" [ngModel]="form().stdCost" (ngModelChange)="updateField('stdCost', $event === '' ? null : +$event)" />
+      </label>
+      <label>
+        <span>Purchase Cost</span>
+        <input type="number" min="0" [ngModel]="form().purchaseCost" (ngModelChange)="updateField('purchaseCost', $event === '' ? null : +$event)" />
+      </label>
+      <label>
+        <span>Std. Sale Price</span>
+        <input type="number" min="0" [ngModel]="form().salePrice" (ngModelChange)="updateField('salePrice', $event === '' ? null : +$event)" />
+      </label>
+    </div>
+    <button class="link" type="button" (click)="openPricing()">Customer Category-wise Rates</button>
+
+    <div class="section-title">Tax</div>
+    <div class="grid">
+      <label>
+        <span>HSN/SAC</span>
+        <input [ngModel]="form().hsnSac" (ngModelChange)="updateField('hsnSac', $event)" />
+      </label>
+      <label>
+        <span>GST %</span>
+        <input type="number" min="0" [ngModel]="form().gst" (ngModelChange)="updateField('gst', $event === '' ? null : +$event)" />
+      </label>
+      <label>
+        <span>MRP</span>
+        <input type="number" min="0" [ngModel]="form().mrp" (ngModelChange)="updateField('mrp', $event === '' ? null : +$event)" />
+      </label>
+    </div>
+
+    <div class="section-title">Descriptions</div>
+    <div class="grid two">
+      <label>
+        <span>Description</span>
+        <textarea rows="2" [ngModel]="form().description" (ngModelChange)="updateField('description', $event)"></textarea>
+      </label>
+      <label>
+        <span>Internal Notes</span>
+        <textarea rows="2" [ngModel]="form().internalNotes" (ngModelChange)="updateField('internalNotes', $event)"></textarea>
+      </label>
+    </div>
+
+    <div class="section-title">Policy</div>
+    <div class="grid">
+      <label>
+        <span>Min Stock</span>
+        <input type="number" min="0" [ngModel]="form().minStock" (ngModelChange)="updateField('minStock', $event === '' ? null : +$event)" />
+      </label>
+      <label>
+        <span>Lead Time (days)</span>
+        <input type="number" min="0" [ngModel]="form().leadTimeDays" (ngModelChange)="updateField('leadTimeDays', $event === '' ? null : +$event)" />
+      </label>
+    </div>
+
+    <div class="section-title">Tags</div>
+    <div class="grid">
+      <label>
+        <span>Add Tag</span>
+        <div class="inline">
+          <input [ngModel]="form().newTag" (ngModelChange)="updateField('newTag', $event)" placeholder="350W" />
+          <button type="button" class="small" (click)="addTag()">+</button>
+        </div>
+        <div class="tags">
+          <span class="tag" *ngFor="let t of form().tags">
+            {{ t }}
+            <button type="button" (click)="removeTag(t)">×</button>
+          </span>
+        </div>
       </label>
     </div>
 
     <div class="footer">
-      <button class="btn" (click)="save()">Save</button>
+      <div class="error" *ngIf="!isValid()">Fill required fields to save.</div>
+      <div class="spacer"></div>
       <a class="btn ghost" routerLink="/inventory">Cancel</a>
+      <button class="btn" [disabled]="!isValid()" (click)="onSubmit()">Save</button>
     </div>
   </div>
 </section>

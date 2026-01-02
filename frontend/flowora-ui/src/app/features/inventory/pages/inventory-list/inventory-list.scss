@@ -1,1 +1,59 @@
 /* InventoryList uses global ui-kit.scss */
+.detail-card {
+  border: 1px solid var(--border-soft);
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: var(--shadow-xs);
+  padding: 12px;
+  display: grid;
+  gap: 10px;
+}
+
+.detail-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+}
+
+.detail-title {
+  font-weight: 700;
+  font-size: 16px;
+}
+
+.detail-sub {
+  color: var(--ink-500);
+  font-size: 13px;
+}
+
+.detail-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.detail-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 10px;
+}
+
+.metric {
+  border: 1px solid var(--border-soft);
+  border-radius: 10px;
+  padding: 10px;
+  background: #f8fafc;
+}
+
+.metric .label {
+  font-size: 12px;
+  color: var(--ink-500);
+}
+
+.metric .value {
+  font-weight: 700;
+  margin-top: 4px;
+}
+
+.mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New';
+}

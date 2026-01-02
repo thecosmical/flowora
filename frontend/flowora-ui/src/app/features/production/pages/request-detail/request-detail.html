@@ -1,0 +1,88 @@
+<div class="fx-container" *ngIf="request as r; else missing">
+  <section class="fx-card fx-pad">
+    <div class="fx-head">
+      <div>
+        <h2 class="fx-title">{{ r.id }} • {{ productInfo?.name ?? 'Product' }}</h2>
+        <div class="fx-sub">Type: {{ r.type === 'ISSUE' ? 'Inventory Issue' : 'Purchase' }} • Requested by {{ r.requestedBy }}</div>
+      </div>
+      <div class="fx-head-actions">
+        <span class="fx-pill" [ngClass]="r.status.toLowerCase()">{{ r.status }}</span>
+        <a class="fx-btnlink fx-btn-ghost" routerLink="/production/requests">Back</a>
+        <button class="btn" *ngIf="canApprove(r.status)" (click)="approveMock()">Approve</button>
+        <button class="btn ghost" *ngIf="canApprove(r.status)" (click)="rejectMock()">Reject</button>
+      </div>
+    </div>
+
+    <div class="cards">
+      <div class="card">
+        <div class="label">Approvers</div>
+        <div class="value">{{ r.approvers.join(', ') }}</div>
+      </div>
+      <div class="card">
+        <div class="label">Approved By</div>
+        <div class="value">{{ r.approvedBy?.join(', ') || 'Pending' }}</div>
+      </div>
+      <div class="card">
+        <div class="label">Docs</div>
+        <div class="value">
+          <div *ngIf="r.docs?.length; else nodoc">
+            <div *ngFor="let d of r.docs">{{ d.name }}</div>
+          </div>
+          <ng-template #nodoc>Placeholder</ng-template>
+          <div class="attach">
+            <input type="text" placeholder="Add doc name" #docName />
+            <button class="btn ghost" type="button" (click)="requestStore.addAttachment(r.id, docName.value); docName.value=''">Attach</button>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="label">Totals (Used / Returned / Rejected)</div>
+        <div class="value">{{ summary()?.used ?? 0 }} / {{ summary()?.returned ?? 0 }} / {{ summary()?.rejected ?? 0 }}</div>
+      </div>
+    </div>
+
+    <h3>Lines</h3>
+    <table class="fx-table">
+      <thead>
+      <tr>
+        <th class="fx-th">Item</th>
+        <th class="fx-th">Requested</th>
+        <th class="fx-th">Approved</th>
+        <th class="fx-th">Used</th>
+        <th class="fx-th">Returned</th>
+        <th class="fx-th">Rejected</th>
+        <th class="fx-th">Reason</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr class="fx-tr" *ngFor="let l of lineItems">
+        <td class="fx-td fx-mono">{{ l.itemId }}</td>
+        <td class="fx-td">{{ l.requestedQty }}</td>
+        <td class="fx-td">{{ l.approvedQty }}</td>
+        <td class="fx-td">{{ l.usedQty }}</td>
+        <td class="fx-td">{{ l.returnedQty }}</td>
+        <td class="fx-td">{{ l.rejectedQty }}</td>
+        <td class="fx-td">{{ l.reason || '-' }}</td>
+      </tr>
+      </tbody>
+    </table>
+
+    <h3>Activity</h3>
+    <div class="history">
+      <div class="event" *ngFor="let e of history">
+        <div class="row">
+          <span class="pill" [ngClass]="e.kind.toLowerCase()">{{ e.kind }}</span>
+          <span class="mono">{{ e.at }}</span>
+          <span>{{ e.by }}</span>
+          <span>{{ e.qty }} units</span>
+          <span class="reason">{{ e.reason || '' }}</span>
+        </div>
+      </div>
+      <div class="fx-empty" *ngIf="history.length === 0">No activity recorded.</div>
+    </div>
+  </section>
+</div>
+
+<ng-template #missing>
+  <div class="fx-container">Request not found.</div>
+</ng-template>

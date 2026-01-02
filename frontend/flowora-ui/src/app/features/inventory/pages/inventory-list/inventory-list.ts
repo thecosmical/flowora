@@ -17,6 +17,7 @@ readonly q = signal('');
 readonly showInactive = signal(false);
 readonly lowOnly = signal(false);
 readonly expDays = signal<number | null>(30);
+readonly openId = signal<string | null>(null);
 
 readonly scopeMode = computed(() => this.store.scope().mode);
 
@@ -64,4 +65,8 @@ setScopeAll() { this.store.scope.set({ mode: 'ALL' }); }
     const loc = this.store.getLocation(scope.locationId);
     return loc ? loc.name : 'Location';
   });
+
+  toggle(id: string) {
+    this.openId.set(this.openId() === id ? null : id);
+  }
 }

@@ -1,0 +1,16 @@
+.fx-pill.pending { background: #fff4e5; border-color: #f4dcb5; color: #c56618; }
+.fx-pill.approved { background: #e7f5ec; border-color: #bee3cc; color: #1c7c3a; }
+.fx-pill.rejected { background: #fde5e1; border-color: #f3b0b0; color: #b42318; }
+.fx-pill.closed { background: #edf2fb; border-color: #c7d7f5; color: #335a9f; }
+
+.pill-btn { display: inline-flex; align-items: center; gap: 6px; background: transparent; border: none; cursor: pointer; }
+.chevron { font-size: 12px; color: var(--ink-500); }
+.fx-detail .detail-card { background: #fdfefe; border: 1px solid var(--border-soft); border-radius: 12px; padding: 12px; display: grid; gap: 10px; box-shadow: var(--shadow-xs); }
+.detail-row { display: flex; gap: 12px; flex-wrap: wrap; font-size: 13px; }
+.lines, .history { display: grid; gap: 6px; }
+.line-head { font-weight: 700; font-size: 13px; color: var(--ink-500); }
+.line-row, .hist-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(90px, 1fr)); gap: 8px; align-items: center; font-size: 13px; }
+.reason { color: var(--ink-500); }
+.pill.used { background:#e7f5ec; border:1px solid #bee3cc; }
+.pill.returned { background:#edf2fb; border:1px solid #c7d7f5; }
+.pill.rejected { background:#fde5e1; border:1px solid #f3b0b0; }

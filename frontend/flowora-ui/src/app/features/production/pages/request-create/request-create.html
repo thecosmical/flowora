@@ -1,0 +1,70 @@
+<div class="fx-container">
+  <section class="fx-card fx-pad">
+    <div class="fx-head">
+      <div>
+        <h2 class="fx-title">New Production Request</h2>
+        <div class="fx-sub">Choose approvers by type; add reasons inline.</div>
+      </div>
+      <div class="fx-head-actions">
+        <a class="fx-btnlink fx-btn-ghost" routerLink="/production/requests">Back</a>
+        <button class="btn" (click)="save()">Save (mock)</button>
+      </div>
+    </div>
+
+    <div class="grid">
+      <label>
+        <span>Type</span>
+        <select [ngModel]="form().type" (ngModelChange)="updateForm('type', $event)">
+          <option value="ISSUE">Inventory Issue</option>
+          <option value="PURCHASE">Purchase</option>
+        </select>
+      </label>
+
+      <label>
+        <span>Final Product</span>
+        <select [ngModel]="form().productId" (ngModelChange)="updateForm('productId', $event)">
+          <option *ngFor="let p of products" [value]="p.id">{{ p.name }}</option>
+        </select>
+      </label>
+
+      <label>
+        <span>Requested By</span>
+        <input [ngModel]="form().requestedBy" (ngModelChange)="updateForm('requestedBy', $event)" />
+      </label>
+    </div>
+
+    <div class="approvers">
+      <div class="title">Approvers ({{ form().type === 'PURCHASE' ? 'Ops Manager + CEO' : 'Ops Manager/CEO' }})</div>
+      <div class="chips">
+        <button
+          type="button"
+          class="pill"
+          [class.active]="form().approvers.includes(a)"
+          *ngFor="let a of approverOptions()"
+          (click)="toggleApprover(a)"
+        >
+          {{ a }}
+        </button>
+      </div>
+    </div>
+
+    <h3>Lines</h3>
+    <div class="line" *ngFor="let l of form().lines; index as i">
+      <select [ngModel]="l.itemId" (ngModelChange)="updateLine(i, 'itemId', $event)">
+        <option *ngFor="let it of items" [value]="it.id">{{ it.name }}</option>
+      </select>
+      <input type="number" min="1" [ngModel]="l.qty" (ngModelChange)="updateLine(i, 'qty', +$event)" />
+      <select [ngModel]="l.reason" (ngModelChange)="updateLine(i, 'reason', $event)">
+        <option value="">Reason (optional)</option>
+        <option *ngFor="let r of reasonSeeds()" [value]="r">{{ r }}</option>
+      </select>
+      <button class="btn ghost" type="button" (click)="removeLine(i)">Remove</button>
+    </div>
+    <button class="btn ghost" type="button" (click)="addLine()">+ Add line</button>
+
+    <div class="add-reason">
+      <input placeholder="Add custom reason" [ngModel]="form().newReason" (ngModelChange)="updateForm('newReason', $event)" />
+      <button class="btn ghost" type="button" (click)="addReason()">Add Reason</button>
+    </div>
+  </section>
+</div>
