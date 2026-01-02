@@ -1,0 +1,56 @@
+<section class="panel" *ngIf="item() as it; else missing">
+  <div class="top">
+    <div>
+      <h2>Issue / Consume</h2>
+      <div class="meta">{{ it.sku }} • {{ it.name }}</div>
+    </div>
+    <a class="link" [routerLink]="['/inventory', it.id]">Back</a>
+  </div>
+
+  <div class="form">
+    <label>
+      Location
+      <select [value]="locationId()" (change)="onLocationChange(($any($event.target)).value)">
+        <option *ngFor="let l of store.locations()" [value]="l.id">{{ l.name }}</option>
+      </select>
+    </label>
+
+    <label>
+      Batch (FEFO)
+      <select
+        [value]="(selectedBatchId() ?? defaultBatchId())"
+        (change)="selectedBatchId.set(($any($event.target)).value)"
+      >
+        <option *ngFor="let b of fefo()" [value]="b.batchId">
+          {{ b.batch?.batchNumber }} • exp {{ b.batch?.expiryDate }} • qty {{ b.qty }}
+        </option>
+      </select>
+    </label>
+
+    <label>
+      Quantity
+      <input type="number" min="1" [value]="qty()" (input)="qty.set(+($any($event.target)).value)" />
+    </label>
+  </div>
+
+  <div class="status" *ngIf="selected() as s">
+    <div>
+      Selected:
+      <b>{{ s.batch?.batchNumber }}</b>
+      exp <span class="mono">{{ s.batch?.expiryDate }}</span>
+      available <b>{{ s.qty }}</b>
+    </div>
+  </div>
+
+  <div class="err" *ngIf="error()">{{ error() }}</div>
+
+  <button class="btn" [disabled]="!!error()" (click)="onSubmit()">Submit (UI only)</button>
+
+  <div class="hint">
+    FEFO suggestion auto-picks earliest-expiring batch with stock. Expired batch is blocked.
+  </div>
+</section>
+
+<ng-template #missing>
+  <div>Item not found.</div>
+</ng-template>

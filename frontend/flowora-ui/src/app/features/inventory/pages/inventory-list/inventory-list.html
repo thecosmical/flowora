@@ -1,0 +1,91 @@
+<div class="fx-container">
+  <section class="fx-card fx-pad">
+    <div class="fx-head">
+      <div>
+        <h2 class="fx-title">Raw Inventory</h2>
+        <div class="fx-sub">Track batches & expiry across locations • FEFO ready</div>
+      </div>
+      <div class="fx-sub">Scope: <b>{{ scopeLabel() }}</b></div>
+    </div>
+
+    <div class="fx-row" style="margin-top: 14px;">
+      <input
+        class="fx-input"
+        [value]="q()"
+        (input)="q.set(($any($event.target)).value)"
+        placeholder="Search SKU / Name / Category"
+      />
+
+      <select
+        class="fx-select"
+        [value]="scopeMode() === 'ALL' ? 'ALL' : selectedLocationId()"
+        (change)="($any($event.target)).value === 'ALL' ? setScopeAll() : setScopeOne(($any($event.target)).value)"
+      >
+        <option value="ALL">All Locations</option>
+        <option *ngFor="let l of locations()" [value]="l.id">{{ l.name }}</option>
+      </select>
+
+      <select
+        class="fx-select"
+        [value]="expDays() === null ? 'NONE' : expDays()"
+        (change)="($any($event.target)).value === 'NONE' ? expDays.set(null) : expDays.set(+($any($event.target)).value)"
+      >
+        <option value="30">Expiring ≤ 30d</option>
+        <option value="15">Expiring ≤ 15d</option>
+        <option value="7">Expiring ≤ 7d</option>
+        <option value="NONE">No expiry filter</option>
+      </select>
+
+      <label class="fx-check">
+        <input type="checkbox" [checked]="lowOnly()" (change)="lowOnly.set(($any($event.target)).checked)" />
+        Low stock
+      </label>
+
+      <label class="fx-check">
+        <input type="checkbox" [checked]="showInactive()" (change)="showInactive.set(($any($event.target)).checked)" />
+        Show inactive
+      </label>
+
+      <div class="fx-spacer"></div>
+    </div>
+
+    <table class="fx-table">
+      <thead>
+      <tr>
+        <th class="fx-th">SKU</th>
+        <th class="fx-th">Name</th>
+        <th class="fx-th">Category</th>
+        <th class="fx-th fx-num">Stock</th>
+        <th class="fx-th">Earliest Expiry</th>
+        <th class="fx-th">Status</th>
+        <th class="fx-th">Risk</th>
+        <th class="fx-th"></th>
+      </tr>
+      </thead>
+
+      <tbody>
+      <tr class="fx-tr" *ngFor="let r of rows()">
+        <td class="fx-td fx-mono">{{ r.item.sku }}</td>
+        <td class="fx-td">{{ r.item.name }}</td>
+        <td class="fx-td">{{ r.item.category }}</td>
+        <td class="fx-td fx-num">{{ r.qty }}</td>
+        <td class="fx-td fx-mono">{{ r.earliest ?? '-' }}</td>
+        <td class="fx-td">{{ r.item.status }}</td>
+        <td class="fx-td">
+          <span class="fx-pill bad" *ngIf="r.expired">Expired</span>
+          <span class="fx-pill warn" *ngIf="!r.expired && r.expSoon">Expiring</span>
+          <span class="fx-pill low" *ngIf="r.low">Low</span>
+          <span class="fx-pill ok" *ngIf="!r.expired && !r.expSoon && !r.low">OK</span>
+        </td>
+        <td class="fx-td" style="text-align:right;">
+          <a class="fx-btnlink" [routerLink]="['/inventory', r.item.id]">View</a>
+        </td>
+      </tr>
+
+      <tr *ngIf="rows().length === 0">
+        <td class="fx-td fx-empty" colspan="8">No items match filters.</td>
+      </tr>
+      </tbody>
+    </table>
+  </section>
+</div>

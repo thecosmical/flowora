@@ -1,0 +1,43 @@
+<section class="page">
+  <div class="header">
+    <div>
+      <h1>Create Inventory Item</h1>
+      <div class="sub">Dummy local store (no backend yet)</div>
+    </div>
+    <a class="btn ghost" routerLink="/inventory">Back</a>
+  </div>
+
+  <div class="card">
+    <div class="grid">
+      <label>
+        <span>ID</span>
+        <input [(ngModel)]="id" placeholder="INV-2001" />
+      </label>
+
+      <label>
+        <span>Name</span>
+        <input [(ngModel)]="name" placeholder="Item name" />
+      </label>
+
+      <label>
+        <span>SKU</span>
+        <input [(ngModel)]="sku" placeholder="SKU-XX" />
+      </label>
+
+      <label>
+        <span>Quantity</span>
+        <input type="number" [(ngModel)]="quantity" />
+      </label>
+
+      <label class="wide">
+        <span>Location</span>
+        <input [(ngModel)]="location" placeholder="Dehradun WH-A" />
+      </label>
+    </div>
+
+    <div class="footer">
+      <button class="btn" (click)="save()">Save</button>
+      <a class="btn ghost" routerLink="/inventory">Cancel</a>
+    </div>
+  </div>
+</section>

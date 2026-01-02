@@ -1,0 +1,79 @@
+.page {
+  display: grid;
+  gap: 14px;
+}
+
+.header {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 12px;
+
+  h1 {
+    margin: 0;
+    font-size: 24px;
+  }
+
+  .sub {
+    margin-top: 6px;
+    opacity: 0.75;
+    font-size: 13px;
+  }
+}
+
+.card {
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  background: rgba(255, 255, 255, 0.04);
+  padding: 14px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+label {
+  display: grid;
+  gap: 6px;
+
+  span {
+    font-size: 12px;
+    opacity: 0.75;
+  }
+
+  input {
+    padding: 10px 12px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: rgba(255, 255, 255, 0.06);
+    color: #e7e9ee;
+    outline: none;
+  }
+}
+
+.wide {
+  grid-column: 1 / -1;
+}
+
+.footer {
+  margin-top: 14px;
+  display: flex;
+  gap: 10px;
+}
+
+.btn {
+  text-decoration: none;
+  color: #ffffff;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: rgba(122, 162, 255, 0.28);
+  border: 0;
+  cursor: pointer;
+}
+
+.ghost {
+  background: rgba(255, 255, 255, 0.08);
+}

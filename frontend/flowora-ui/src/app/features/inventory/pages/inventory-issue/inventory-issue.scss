@@ -1,0 +1,12 @@
+.panel { border:1px solid #eee; border-radius:12px; padding:16px; display:flex; flex-direction:column; gap:14px; }
+.top { display:flex; justify-content:space-between; align-items:flex-start; gap:12px; }
+.meta { color:#666; }
+.link { text-decoration:none; }
+.form { display:grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap:12px; }
+label { display:flex; flex-direction:column; gap:8px; }
+select, input { padding:10px 12px; border:1px solid #ddd; border-radius:10px; }
+.btn { padding:10px 12px; border:1px solid #ddd; border-radius:10px; cursor:pointer; }
+.btn[disabled] { opacity:0.5; cursor:not-allowed; }
+.err { padding:10px 12px; border:1px solid #f3b0b0; border-radius:10px; }
+.hint { color:#666; font-size:12px; }
+.mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono"; }

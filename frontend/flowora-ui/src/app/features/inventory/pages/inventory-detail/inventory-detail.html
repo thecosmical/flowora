@@ -1,0 +1,74 @@
+<section class="wrap" *ngIf="item() as it; else missing">
+  <div class="top">
+    <div>
+      <div class="sku">{{ it.sku }}</div>
+      <h2>{{ it.name }}</h2>
+      <div class="meta">{{ it.category }} • {{ it.uom }} • {{ it.status }}</div>
+    </div>
+
+    <div class="cta">
+      <a class="btn" [routerLink]="['/inventory', it.id, 'issue']">Issue / Consume</a>
+
+      <a class="link" routerLink="/inventory">Back</a>
+    </div>
+  </div>
+
+  <div class="cards">
+    <div class="card">
+      <div class="label">Scope</div>
+      <div class="value">{{ scope().mode === 'ALL' ? 'All Locations' : 'Single Location' }}</div>
+    </div>
+    <div class="card">
+      <div class="label">Earliest expiry</div>
+      <div class="value mono">{{ earliest() ?? '-' }}</div>
+    </div>
+    <div class="card">
+      <div class="label">Reorder min</div>
+      <div class="value">{{ it.reorderMinQty ?? '-' }}</div>
+    </div>
+  </div>
+
+  <div class="grid">
+    <div class="block">
+      <h3>Stock by Location</h3>
+      <div class="row head"><div>Location</div><div class="num">Qty</div></div>
+      <div class="row" *ngFor="let r of byLocation()">
+        <div>{{ r.location?.name ?? r.locationId }}</div>
+        <div class="num">{{ r.qty }}</div>
+      </div>
+    </div>
+
+    <div class="block">
+      <h3>Stock by Batch (FEFO)</h3>
+      <div class="row head"><div>Batch</div><div>Expiry</div><div class="num">Qty</div><div>Risk</div></div>
+      <div class="row" *ngFor="let r of byBatch()">
+        <div class="mono">{{ r.batch?.batchNumber }}</div>
+        <div class="mono">{{ r.batch?.expiryDate }}</div>
+        <div class="num">{{ r.qty }}</div>
+        <div>
+          <span class="pill danger" *ngIf="r.batch && store.isExpired(r.batch.expiryDate)">Expired</span>
+          <span class="pill warn" *ngIf="r.batch && !store.isExpired(r.batch.expiryDate) && store.isExpiringWithin(r.batch.expiryDate, 30)">Expiring</span>
+          <span class="pill ok" *ngIf="r.batch && !store.isExpired(r.batch.expiryDate) && !store.isExpiringWithin(r.batch.expiryDate, 30)">OK</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h3>Movement History (latest 30)</h3>
+    <div class="row head"><div>When</div><div>Type</div><div>Qty</div><div>From</div><div>To</div><div>Reason</div><div>By</div></div>
+    <div class="row" *ngFor="let m of movements()">
+      <div class="mono">{{ m.occurredAt }}</div>
+      <div>{{ m.type }}</div>
+      <div class="num">{{ m.qty }}</div>
+      <div class="mono">{{ m.fromLocationId ?? '-' }}</div>
+      <div class="mono">{{ m.toLocationId ?? '-' }}</div>
+      <div>{{ m.reasonCode ?? '-' }}</div>
+      <div class="mono">{{ m.performedBy }}</div>
+    </div>
+  </div>
+</section>
+
+<ng-template #missing>
+  <div>Item not found.</div>
+</ng-template>

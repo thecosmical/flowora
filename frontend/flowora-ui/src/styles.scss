@@ -1,1 +1,23 @@
-/* You can add global styles to this file, and also import other style files */
+/* 1. Your design system (tokens + components) MUST load before other rules */
+@use './styles/ui-kit.scss' as *;
+
+/* 2. Tailwind base reset */
+@tailwind base;
+
+/* 3. Tailwind components (optional) */
+@tailwind components;
+
+/* 4. Tailwind utilities LAST */
+@tailwind utilities;
+
+/* 5. App base */
+html, body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink-900);
+  font-family: var(--font);
+}
