@@ -7,21 +7,32 @@
       </div>
       <div class="fx-head-actions">
         <span class="fx-sub">Scope: <b>{{ scopeLabel() }}</b></span>
+        <a class="fx-btn ghost small" routerLink="/inventory/lead-fulfillment">Lead fulfillment</a>
         <a class="fx-btn ghost small" routerLink="/inventory/create">+ Create SKU</a>
       </div>
     </div>
 
     <div class="fx-row filters">
       <label class="fx-input-group">
+        <span>Inventory type</span>
+        <select class="fx-select" [value]="typeFilter()" (change)="handleTypeChange($any($event.target).value)">
+          <option value="ALL">All inventory</option>
+          <option value="FINISHED">Finished Goods Inventory</option>
+          <option value="RAW">Raw Inventory</option>
+          <option value="__add__">+ Add new inventory type…</option>
+        </select>
+      </label>
+      <label class="fx-input-group">
         <span>Search SKU / Name / Category / Industry</span>
         <input class="fx-input" [value]="q()" (input)="q.set(($any($event.target)).value)" placeholder="Search..." />
       </label>
 
       <label class="fx-input-group">
-        <span>Location</span>
-        <select class="fx-select" [value]="scopeMode() === 'ALL' ? 'ALL' : selectedLocationId()" (change)="($any($event.target).value === 'ALL') ? setScopeAll() : setScopeOne($any($event.target).value)">
+        <span>Location / Store</span>
+        <select class="fx-select" [value]="scopeMode() === 'ALL' ? 'ALL' : selectedLocationId()" (change)="handleLocationChange($any($event.target).value)">
           <option value="ALL">All Locations</option>
           <option *ngFor="let l of locations()" [value]="l.id">{{ l.name }}</option>
+          <option value="__add__">+ Add new store / location…</option>
         </select>
       </label>
 
@@ -43,6 +54,9 @@
         <input type="checkbox" [checked]="showInactive()" (change)="showInactive.set($any($event.target).checked)" />
         Show inactive
       </label>
+      <div class="fx-head-actions" style="margin-left:auto;">
+        <a class="fx-btn ghost small" routerLink="/inventory/create">Bulk add SKUs / new categories</a>
+      </div>
     </div>
 
     <table class="fx-table">
@@ -52,6 +66,7 @@
         <th class="fx-th">Name</th>
         <th class="fx-th">Industry</th>
         <th class="fx-th">Category</th>
+        <th class="fx-th">UOM</th>
         <th class="fx-th">HSN/SAC</th>
         <th class="fx-th fx-num">Stock</th>
         <th class="fx-th fx-num">Min (scope)</th>
@@ -69,6 +84,7 @@
           <td class="fx-td">{{ r.item.name }}</td>
           <td class="fx-td">{{ r.item.industry || '-' }}</td>
           <td class="fx-td">{{ r.item.category }}</td>
+          <td class="fx-td fx-mono">{{ r.item.uom || '-' }}</td>
           <td class="fx-td fx-mono">{{ r.item.hsnSac ?? '-' }}</td>
           <td class="fx-td fx-num">
             <span *ngIf="r.qty === 0" class="fx-sub">0 (Awaiting stock)</span>
@@ -91,7 +107,7 @@
           </td>
         </tr>
         <tr class="fx-detail" *ngIf="openId() === r.item.id">
-          <td class="fx-td" colspan="9">
+          <td class="fx-td" colspan="12">
             <div class="detail-card">
               <div class="detail-head">
                 <div>
@@ -132,6 +148,10 @@
               <div class="metric">
                 <div class="label">Scope</div>
                 <div class="value">{{ scopeLabel() }}</div>
+              </div>
+              <div class="metric">
+                <div class="label">Unit of Measure</div>
+                <div class="value mono">{{ r.item.uom || '-' }}</div>
               </div>
               <div class="metric">
                 <div class="label">Tags</div>
@@ -210,7 +230,7 @@
         </tr>
       </ng-container>
       <tr *ngIf="rows().length === 0">
-        <td class="fx-td fx-empty" colspan="9">
+        <td class="fx-td fx-empty" colspan="12">
           No items match filters. <a routerLink="/inventory/create" class="fx-btnlink">Add Item</a>
         </td>
       </tr>

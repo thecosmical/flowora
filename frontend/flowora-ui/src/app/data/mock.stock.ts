@@ -17,8 +17,14 @@ export const STOCK: StockRow[] = [
   { itemId: 'IT-WELD-12', locationId: 'LOC-2', batchId: 'B-WELD-02', qty: 360 },
 
   { itemId: 'IT-PAINT-GRAY', locationId: 'LOC-3', batchId: 'B-PNT-01', qty: 220 },
-  { itemId: 'IT-PAINT-RED', locationId: 'LOC-3', batchId: 'B-PNT-02', qty: 180 },
+  { itemId: 'IT-PAINT-RED', locationId: 'LOC-3', batchId: 'B-PNT-02', qty: 0 },
 
   { itemId: 'IT-NAME-PLATE', locationId: 'LOC-1', batchId: 'B-NP-01', qty: 900 },
-  { itemId: 'IT-HYDRO-PLUG', locationId: 'LOC-3', batchId: 'B-HYD-01', qty: 60 }
+  { itemId: 'IT-HYDRO-PLUG', locationId: 'LOC-3', batchId: 'B-HYD-01', qty: 60 },
+
+  { itemId: 'FG-OXY-10L', locationId: 'LOC-1', batchId: 'B-FG-OXY10-01', qty: 500 },
+  { itemId: 'FG-OXY-40L', locationId: 'LOC-1', batchId: 'B-FG-OXY40-01', qty: 180 },
+  { itemId: 'FG-CO2-4KG', locationId: 'LOC-2', batchId: 'B-FG-CO2-01', qty: 260 },
+  { itemId: 'FG-OXY-15L-OLD', locationId: 'LOC-2', batchId: 'B-FG-OXY15-OLD', qty: 60 },
+  { itemId: 'FG-EXT-6KG-OUT', locationId: 'LOC-2', batchId: 'B-FG-CO2-6KG', qty: 0 }
 ];

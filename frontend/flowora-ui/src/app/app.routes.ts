@@ -11,6 +11,10 @@ import { RequestDetailComponent } from './features/production/pages/request-deta
 import { RequestCreateComponent } from './features/production/pages/request-create/request-create';
 import { NotificationCenterComponent } from './features/notifications/notification-center/notification-center';
 import { AuditListComponent } from './features/audit/audit-list';
+import { PurchaseRequestsComponent } from './features/procurement/purchase-requests/purchase-requests';
+import { PurchaseCreateComponent } from './features/procurement/purchase-create/purchase-create';
+import { PurchaseInvoicesComponent } from './features/procurement/purchase-invoices/purchase-invoices';
+import { SuppliersComponent } from './features/procurement/suppliers/suppliers';
 
 export const routes: Routes = [
 {
@@ -21,12 +25,17 @@ children: [
 { path: 'home', component: HomeComponent },
 { path: 'inventory', component: InventoryList },
 { path: 'inventory/create', component: InventoryCreateComponent },
+{ path: 'inventory/lead-fulfillment', loadComponent: () => import('./features/inventory/pages/lead-fulfillment/lead-fulfillment').then(m => m.LeadFulfillmentComponent) },
 { path: 'inventory/:id', component: InventoryDetail },
 { path: 'inventory/:id/issue', component: InventoryIssue },
 { path: 'templates/new', component: TemplateCreateComponent },
 { path: 'production/requests', component: RequestListComponent },
 { path: 'production/request/new', component: RequestCreateComponent },
 { path: 'production/request/:id', component: RequestDetailComponent },
+{ path: 'procurement/purchases', component: PurchaseRequestsComponent },
+{ path: 'procurement/purchases/new', component: PurchaseCreateComponent },
+{ path: 'procurement/purchases/received', component: PurchaseInvoicesComponent },
+{ path: 'procurement/suppliers', component: SuppliersComponent },
 { path: 'notifications', component: NotificationCenterComponent },
 { path: 'audit', component: AuditListComponent }
 ]

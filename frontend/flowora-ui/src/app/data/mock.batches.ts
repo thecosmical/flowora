@@ -27,5 +27,11 @@ export const BATCHES: Batch[] = [
   { id: 'B-PNT-02', itemId: 'IT-PAINT-RED', batchNumber: 'TOP-RED-2409', expiryDate: addDays(150) },
 
   { id: 'B-NP-01', itemId: 'IT-NAME-PLATE', batchNumber: 'NP-2409', expiryDate: addDays(720) },
-  { id: 'B-HYD-01', itemId: 'IT-HYDRO-PLUG', batchNumber: 'HYD-PLUG-2408', expiryDate: addDays(90) }
+  { id: 'B-HYD-01', itemId: 'IT-HYDRO-PLUG', batchNumber: 'HYD-PLUG-2408', expiryDate: addDays(90) },
+
+  { id: 'B-FG-OXY10-01', itemId: 'FG-OXY-10L', batchNumber: 'OXY-10-FG-2409', expiryDate: addDays(540) },
+  { id: 'B-FG-OXY40-01', itemId: 'FG-OXY-40L', batchNumber: 'OXY-40-FG-2409', expiryDate: addDays(540) },
+  { id: 'B-FG-CO2-01', itemId: 'FG-CO2-4KG', batchNumber: 'CO2-FG-2409', expiryDate: addDays(420) },
+  { id: 'B-FG-OXY15-OLD', itemId: 'FG-OXY-15L-OLD', batchNumber: 'OXY-15-FG-2401', expiryDate: addDays(-90) },
+  { id: 'B-FG-CO2-6KG', itemId: 'FG-EXT-6KG-OUT', batchNumber: 'CO2-6KG-2409', expiryDate: addDays(360) }
 ];

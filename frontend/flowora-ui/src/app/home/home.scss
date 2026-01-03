@@ -154,6 +154,7 @@
   gap: var(--space-16);
   margin-top: 20px;
 }
+.search-row { margin: 12px 0 8px; }
 
 .card {
   background: #fff;
@@ -163,6 +164,20 @@
   box-shadow: var(--shadow);
   display: grid;
   gap: 8px;
+}
+.link-card {
+  text-decoration: none;
+  color: inherit;
+  transition: transform 0.12s ease, box-shadow 0.12s ease, border-color 0.12s ease;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+.link-card:hover {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 8px 16px rgba(0,0,0,0.12);
+  border-color: rgba(0,132,255,0.35);
+}
+.link-card:active {
+  transform: translateY(-2px) scale(1.01);
 }
 
 .card p { color: var(--color-text-muted); margin: 0; }

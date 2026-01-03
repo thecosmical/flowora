@@ -29,40 +29,24 @@
     </div>
   </section>
 
+  <section class="search-row">
+    <label class="fx-input-group grow">
+      <span>Find a workspace</span>
+      <input class="fx-input" [value]="search()" (input)="search.set(($any($event.target)).value)" placeholder="Search inventory, purchase orders, suppliers, notifications..." />
+    </label>
+  </section>
+
   <section class="grid">
-    <article class="card">
-      <div class="pill">Inventory</div>
-      <h3>Track stock &amp; expiry</h3>
-      <p>Scope by location, earliest-expiry batches, and per-location safety stock with live risk tags.</p>
-      <a routerLink="/inventory" class="link">Open Inventory →</a>
-    </article>
-
-    <article class="card">
-      <div class="pill">Requests</div>
-      <h3>Request → Approve → Issue</h3>
-      <p>Role-based approvals, inline reasons, and WIP tracking for production or purchase.</p>
-      <a routerLink="/production/requests" class="link">Open Requests →</a>
-    </article>
-
-    <article class="card">
-      <div class="pill">Quality</div>
-      <h3>QA-ready data</h3>
-      <p>HSN/GST, batch expiry, and notes ready for audits and customer docs.</p>
-      <a routerLink="/inventory" class="link">Review batches →</a>
-    </article>
-
-    <article class="card">
-      <div class="pill">Alerts</div>
-      <h3>Notification Center</h3>
-      <p>Assigned tasks and reminders with due dates, status, and SLA breach highlights.</p>
-      <a routerLink="/notifications" class="link">Open Alerts →</a>
-    </article>
-
-    <article class="card">
-      <div class="pill">Audit</div>
-      <h3>Audit-ready log</h3>
-      <p>Read-only record of approvals, stock updates, and tasks across entities.</p>
-      <a routerLink="/audit" class="link">View Audit →</a>
-    </article>
+    <a class="card link-card" *ngFor="let c of filteredCards()" [routerLink]="c.link">
+      <div class="pill">{{ c.pill }}</div>
+      <h3>{{ c.title }}</h3>
+      <p>{{ c.desc }}</p>
+      <span class="link">Open {{ c.title }} →</span>
+    </a>
+    <div class="card" *ngIf="filteredCards().length === 0">
+      <div class="pill">No matches</div>
+      <h3>Nothing found</h3>
+      <p>Try another keyword like “inventory”, “supplier”, “notifications”, or “audit”.</p>
+    </div>
   </section>
 </div>

@@ -111,8 +111,15 @@ body {
   font-size: 14px;
 }
 
+.fx-tr {
+  transition: transform 0.12s ease, box-shadow 0.12s ease, background-color 0.12s ease;
+  transform-origin: center center;
+}
+
 .fx-tr:hover {
   background: rgba(15, 118, 110, 0.06);
+  transform: scale(1.003);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
 }
 
 .fx-pill {
@@ -149,6 +156,8 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 8px;
+  transition: transform 0.12s ease, box-shadow 0.12s ease, border-color 0.12s ease, background-color 0.12s ease;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
 
 .fx-btn.small,
@@ -163,6 +172,20 @@ body {
   color: var(--color-primary);
   border-color: var(--color-primary);
   border-radius: 12px;
+}
+
+.fx-btn:hover,
+.btn:hover,
+.pill-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.12);
+}
+
+.fx-btn:active,
+.btn:active,
+.pill-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
 
 .fx-btn-ghost, .fx-btnlink.fx-btn-ghost {
@@ -184,6 +207,8 @@ body {
   background: #fff;
   cursor: pointer;
   font-weight: 600;
+  transition: transform 0.12s ease, box-shadow 0.12s ease, border-color 0.12s ease, background-color 0.12s ease;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
 }
 
 .fx-card {

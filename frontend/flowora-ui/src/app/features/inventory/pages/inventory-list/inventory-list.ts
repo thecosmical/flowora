@@ -1,6 +1,6 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { InventoryStore } from '../../../../services/inventory-store';
 import { DecisionStore } from '../../../../services/decision-store';
 
@@ -14,6 +14,7 @@ styleUrl: './inventory-list.scss'
 export class InventoryList {
 private readonly store = inject(InventoryStore);
 private readonly decisions = inject(DecisionStore);
+private readonly router = inject(Router);
 
 readonly q = signal('');
 readonly showInactive = signal(false);
@@ -24,6 +25,7 @@ readonly openActionId = signal<string | null>(null);
 readonly simQty = signal(0);
 readonly simPrice = signal(0);
 readonly simLead = signal(0);
+readonly typeFilter = signal<'ALL' | 'RAW' | 'FINISHED'>('ALL');
 
 readonly scopeMode = computed(() => this.store.scope().mode);
 
@@ -34,7 +36,7 @@ return s.mode === 'ONE' ? s.locationId : '';
 
 readonly locations = this.store.locations;
 
-setScopeAll() { this.store.scope.set({ mode: 'ALL' }); }
+  setScopeAll() { this.store.scope.set({ mode: 'ALL' }); }
 
   setScopeOne(locationId: string) {
     this.store.scope.set({ mode: 'ONE', locationId });
@@ -45,12 +47,20 @@ setScopeAll() { this.store.scope.set({ mode: 'ALL' }); }
     const showInactive = this.showInactive();
     const lowOnly = this.lowOnly();
     const expDays = this.expDays();
+    const typeFilter = this.typeFilter();
 
     return this.store.items()
       .filter(i => showInactive ? true : i.status === 'ACTIVE')
       .filter(i => {
         if (!query) return true;
         return [i.sku, i.name, i.category, i.industry ?? ''].some(v => (v ?? '').toLowerCase().includes(query));
+      })
+      .filter(i => {
+        if (typeFilter === 'ALL') return true;
+        const cat = (i.category || '').toLowerCase();
+        const tags = (i.types || []).map(t => t.toLowerCase());
+        const isFinished = cat.includes('finished') || tags.some(t => t.includes('finished') || t.includes('product'));
+        return typeFilter === 'FINISHED' ? isFinished : !isFinished;
       })
       .map(i => {
         const qty = this.store.qtyForItemInScope(i.id);
@@ -158,5 +168,32 @@ setScopeAll() { this.store.scope.set({ mode: 'ALL' }); }
     if (action === 'PLACE_ORDER') this.createActionTask(row);
     if (action === 'REJECT_DECISION') this.rejectActionTask(row);
     this.openActionId.set(null);
+  }
+
+  handleLocationChange(value: string) {
+    if (value === 'ALL') {
+      this.setScopeAll();
+      return;
+    }
+    if (value === '__add__') {
+      const name = prompt('Enter new store / location name');
+      if (name && name.trim()) {
+        const loc = this.store.addLocation(name.trim());
+        this.setScopeOne(loc.id);
+      }
+      return;
+    }
+    this.setScopeOne(value);
+  }
+
+  handleTypeChange(value: string) {
+    if (value === '__add__') {
+      this.router.navigate(['/inventory/create']);
+      this.typeFilter.set('ALL');
+      return;
+    }
+    if (value === 'RAW' || value === 'FINISHED' || value === 'ALL') {
+      this.typeFilter.set(value);
+    }
   }
 }

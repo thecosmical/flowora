@@ -70,8 +70,8 @@
                 <button class="btn" type="button" (click)="action(t.id, 'COMPLETED')">Mark Done</button>
                 <button class="btn ghost" type="button" (click)="action(t.id, 'REJECTED')">Reject</button>
                 <div class="rfq-actions" *ngIf="t.item">
-                  <button class="btn ghost" type="button" (click)="openRfq(t.id, 'SMS')">RFQ via SMS</button>
-                  <button class="btn ghost" type="button" (click)="openRfq(t.id, 'EMAIL')">RFQ via Email</button>
+                  <button class="btn ghost" type="button" (click)="openRfq(t.id, 'SMS')">Request for Quotation from Suppliers via SMS</button>
+                  <button class="btn ghost" type="button" (click)="openRfq(t.id, 'EMAIL')">Request for Quotation from Suppliers via Email</button>
                 </div>
               </div>
 
@@ -90,8 +90,8 @@
     <div class="rfq-modal">
       <div class="rfq-header">
         <div>
-          <div class="pill">RFQ</div>
-          <h3>Request for Quotation</h3>
+          <div class="pill">Request for Quotation from Suppliers</div>
+          <h3>Request for Quotation from Suppliers</h3>
           <div class="rfq-sub">Item {{ rfqTask.item?.name ?? rfqTask.itemId }} · SKU {{ rfqTask.item?.sku || '-' }}</div>
         </div>
         <button class="close" type="button" (click)="closeRfq()">×</button>
