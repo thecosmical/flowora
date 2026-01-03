@@ -1,30 +1,59 @@
-import { Injectable, computed, signal } from '@angular/core';
+import { Injectable, computed, inject, signal } from '@angular/core';
+import { firstValueFrom } from 'rxjs';
+import { ApiClientService, InventoryResponse } from './api-client';
 import { Batch, Item, Location, Movement, Status, StockRow, TrackingType } from '../data/inventory.models';
-import { ITEMS } from '../data/mock.items';
-import { LOCATIONS } from '../data/mock.locations';
-import { BATCHES } from '../data/mock.batches';
-import { STOCK } from '../data/mock.stock';
-import { MOVEMENTS } from '../data/mock.movements';
 
 type LocationScope = { mode: 'ALL' } | { mode: 'ONE'; locationId: string };
 
 @Injectable({ providedIn: 'root' })
 export class InventoryStore {
-private readonly _items = signal<Item[]>(ITEMS);
-private readonly _locations = signal<Location[]>(LOCATIONS);
-private readonly _batches = signal<Batch[]>(BATCHES);
-private readonly _stock = signal<StockRow[]>(STOCK);
-private readonly _movements = signal<Movement[]>(MOVEMENTS);
+  private readonly api = inject(ApiClientService);
 
-readonly items = this._items.asReadonly();
-readonly locations = this._locations.asReadonly();
-readonly batches = this._batches.asReadonly();
-readonly stock = this._stock.asReadonly();
-readonly movements = this._movements.asReadonly();
+  private readonly _items = signal<Item[]>([]);
+  private readonly _locations = signal<Location[]>([]);
+  private readonly _batches = signal<Batch[]>([]);
+  private readonly _stock = signal<StockRow[]>([]);
+  private readonly _movements = signal<Movement[]>([]);
+  private readonly _loading = signal(false);
+  private readonly _loaded = signal(false);
 
-readonly scope = signal<LocationScope>({ mode: 'ALL' });
+  readonly items = this._items.asReadonly();
+  readonly locations = this._locations.asReadonly();
+  readonly batches = this._batches.asReadonly();
+  readonly stock = this._stock.asReadonly();
+  readonly movements = this._movements.asReadonly();
+  readonly loading = this._loading.asReadonly();
+  readonly loaded = this._loaded.asReadonly();
 
-todayIso = () => new Date().toISOString().slice(0, 10);
+  readonly scope = signal<LocationScope>({ mode: 'ALL' });
+
+  todayIso = () => new Date().toISOString().slice(0, 10);
+
+  constructor() {
+    this.refresh();
+  }
+
+  async refresh() {
+    if (this._loading()) return;
+    this._loading.set(true);
+    try {
+      const res = await firstValueFrom(this.api.listInventory());
+      this.hydrate(res);
+      this._loaded.set(true);
+    } catch (err) {
+      console.error('Failed to load inventory from API', err);
+    } finally {
+      this._loading.set(false);
+    }
+  }
+
+  private hydrate(res: InventoryResponse) {
+    this._items.set(res.items ?? []);
+    this._batches.set(res.batches ?? []);
+    this._stock.set(res.stock ?? []);
+    this._locations.set(res.locations ?? []);
+    this._movements.set(res.movements ?? []);
+  }
 
   getItem = (id: string) => this._items().find(i => i.id === id) ?? null;
   getLocation = (id: string) => this._locations().find(l => l.id === id) ?? null;
@@ -37,7 +66,7 @@ todayIso = () => new Date().toISOString().slice(0, 10);
     return location;
   };
 
-  addItem = (payload: {
+  addItem = async (payload: {
     id: string;
     sku: string;
     name: string;
@@ -70,8 +99,16 @@ todayIso = () => new Date().toISOString().slice(0, 10);
     defaultStoreId?: string;
     qty?: number;
   }) => {
+    let createdId = payload.id;
+    try {
+      const res = await firstValueFrom(this.api.createSku(payload));
+      if (res?.id) createdId = res.id;
+    } catch (err) {
+      console.error('Failed to create SKU via API, adding locally', err);
+    }
+
     const item: Item = {
-      id: payload.id,
+      id: createdId,
       sku: payload.sku,
       name: payload.name,
       category: payload.category,
@@ -118,10 +155,10 @@ todayIso = () => new Date().toISOString().slice(0, 10);
     }
   };
 
-stockRowsInScope = computed(() => {
-const s = this._stock();
-const scope = this.scope();
-if (scope.mode === 'ALL') return s;
+  stockRowsInScope = computed(() => {
+    const s = this._stock();
+    const scope = this.scope();
+    if (scope.mode === 'ALL') return s;
     return s.filter(r => r.locationId === scope.locationId);
   });
 
@@ -220,5 +257,25 @@ if (scope.mode === 'ALL') return s;
       }
       return [{ itemId, locationId: primaryLoc.id, batchId, qty }, ...rows];
     });
+  }
+
+  removeStock(itemId: string, qty: number) {
+    if (!Number.isFinite(qty) || qty <= 0) return;
+    let remaining = qty;
+    this._stock.update(rows => {
+      const sorted = [...rows].sort((a, b) => a.batchId.localeCompare(b.batchId));
+      const next = sorted.map(r => {
+        if (r.itemId !== itemId || remaining <= 0) return r;
+        const available = r.qty;
+        if (available <= 0) return r;
+        const toDeduct = Math.min(available, remaining);
+        remaining -= toDeduct;
+        return { ...r, qty: available - toDeduct };
+      });
+      return next;
+    });
+    if (remaining > 0) {
+      console.warn(`Requested to remove ${qty} of ${itemId} but only partially fulfilled. Remaining: ${remaining}`);
+    }
   }
 }

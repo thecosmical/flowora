@@ -1,6 +1,6 @@
 {
-  "name": "flowora-ui",
-  "short_name": "flowora-ui",
+  "name": "OpsControl",
+  "short_name": "OpsControl",
   "display": "standalone",
   "scope": "./",
   "start_url": "./",

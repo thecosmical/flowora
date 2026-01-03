@@ -1,4 +1,4 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, effect, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
@@ -81,6 +81,12 @@ export class InventoryCreateComponent {
       this.selectedTemplate.set(initial);
       this.populate(initial);
     }
+    effect(() => {
+      const defaultStore = this.store.locations()[0];
+      if (!this.form().storeId && defaultStore) {
+        this.form.update(f => ({ ...f, storeId: defaultStore.id }));
+      }
+    });
   }
 
   readonly templateOptions = computed(() => [
@@ -181,14 +187,15 @@ export class InventoryCreateComponent {
     }));
   }
 
-  onSubmit() {
+  async onSubmit() {
     if (!this.isValid()) return;
     const f = this.form();
     const id = f.code.trim();
     const cleanedMinByLoc = Object.fromEntries(
       Object.entries(f.minStockByLocation ?? {}).map(([k, v]) => [k, toNumber(v, 0)])
     );
-    this.store.addItem({
+    try {
+      await this.store.addItem({
       id,
       sku: f.code.trim(),
       name: f.name.trim(),
@@ -222,6 +229,10 @@ export class InventoryCreateComponent {
       qty: f.qty
     });
     alert('Item saved');
-    this.router.navigateByUrl('/inventory');
+      this.router.navigateByUrl('/inventory');
+    } catch (err) {
+      alert('Failed to save item');
+      console.error(err);
+    }
   }
 }

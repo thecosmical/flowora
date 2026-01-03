@@ -6,3 +6,44 @@
 .fx-pill.completed { background:#e7f5ec; border-color:#bee3cc; color:#1c7c3a; }
 .fx-pill.rejected { background:#fde5e1; border-color:#f3b0b0; color:#b42318; }
 .fx-pill.breached { background:#fde5e1; border-color:#f3b0b0; color:#b42318; }
+
+.rfq-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.48);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 20;
+  backdrop-filter: blur(6px);
+}
+
+.rfq-modal {
+  width: min(780px, 92vw);
+  background: #0f172a;
+  color: #e2e8f0;
+  border-radius: 16px;
+  padding: 18px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.35);
+  display: grid;
+  gap: 14px;
+  border: 1px solid rgba(255,255,255,0.08);
+}
+
+.rfq-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+.rfq-header h3 { margin: 4px 0; }
+.rfq-header .pill { display: inline-flex; padding: 4px 8px; border-radius: 999px; background: #22d3ee1a; color: #22d3ee; font-weight: 600; font-size: 12px; }
+.rfq-header .close { background: none; border: none; color: #e2e8f0; font-size: 20px; cursor: pointer; }
+.rfq-sub { color: #cbd5e1; font-size: 13px; }
+.rfq-meta { display: flex; gap: 16px; flex-wrap: wrap; font-size: 13px; color: #cbd5e1; }
+.rfq-form .row { display: flex; gap: 12px; flex-wrap: wrap; }
+.rfq-form label { display: grid; gap: 6px; font-size: 13px; color: #cbd5e1; flex: 1; min-width: 200px; }
+.rfq-form input, .rfq-form select, .rfq-form textarea {
+  background: #0b1223;
+  color: #e2e8f0;
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 10px;
+  padding: 10px;
+}
+.rfq-form textarea { resize: vertical; }
+.rfq-actions-bar { display: flex; justify-content: flex-end; gap: 10px; }

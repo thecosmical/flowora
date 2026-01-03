@@ -1,4 +1,4 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable, effect, signal } from '@angular/core';
 import { InventoryStore } from './inventory-store';
 import { AuditStore } from './audit-store';
 
@@ -35,6 +35,8 @@ type DecisionLog = {
 
 export type TaskStatus = 'PENDING' | 'RECEIVED' | 'COMPLETED' | 'REJECTED' | 'BREACHED';
 
+export type TaskCategory = 'INVENTORY_DISPATCH' | 'REPLENISHMENT' | 'LOW_STOCK' | 'GENERAL';
+
 export type Task = {
   id: string;
   itemId: string;
@@ -45,6 +47,8 @@ export type Task = {
   createdAt: string;
   assignee?: string;
   reason?: string;
+  category?: TaskCategory;
+  requestId?: string;
 };
 
 const DEMAND: Record<string, DemandProfile> = {
@@ -97,6 +101,11 @@ export class DecisionStore {
   constructor(private readonly inventory: InventoryStore, private readonly audit: AuditStore) {}
   private readonly logs = signal<DecisionLog[]>([]);
   private readonly tasks = signal<Task[]>(seedTasks);
+
+  private readonly lowStockWatcher = effect(() => {
+    // reacts to inventory signals to auto-create low stock alerts
+    this.ensureLowStockTasks();
+  });
 
   demandContext(itemId: string) {
     const prof = DEMAND[itemId] ?? { monthly: [50, 50, 50], leadDays: 7, unitCost: 100, seasonality: 1 };
@@ -160,7 +169,14 @@ export class DecisionStore {
     return (DEMAND[itemId]?.leadDays ?? 7);
   }
 
-  addTask(itemId: string, title: string, qty: number, daysToArrive: number, assignee?: string) {
+  addTask(
+    itemId: string,
+    title: string,
+    qty: number,
+    daysToArrive: number,
+    assignee?: string,
+    options?: { category?: TaskCategory; requestId?: string; status?: TaskStatus }
+  ) {
     const due = new Date();
     due.setDate(due.getDate() + daysToArrive);
     const task: Task = {
@@ -168,19 +184,64 @@ export class DecisionStore {
       itemId,
       title,
       qty,
-      status: 'PENDING',
+      status: options?.status ?? 'PENDING',
       dueDate: due.toISOString().slice(0, 10),
       createdAt: new Date().toISOString(),
-      assignee
+      assignee,
+      category: options?.category,
+      requestId: options?.requestId
     };
     this.tasks.update(list => [task, ...list]);
+  }
+
+  private ensureLowStockTasks() {
+    const items = this.inventory.items();
+    if (!items.length) return;
+
+    const nowIso = new Date().toISOString();
+    this.tasks.update(list => {
+      const updated: Task[] = list.map(t => {
+        if (t.category === 'LOW_STOCK') {
+          const item = items.find(i => i.id === t.itemId);
+          const min = item ? this.inventory.minForItemInScope(item) : 0;
+          const qty = this.inventory.qtyForItemInScope(t.itemId);
+          if (min > 0 && qty >= min && t.status !== 'COMPLETED') {
+            return { ...t, status: 'COMPLETED' as TaskStatus, reason: 'Stock recovered' };
+          }
+        }
+        return t;
+      });
+
+      const newTasks: Task[] = [];
+      for (const item of items) {
+        const min = this.inventory.minForItemInScope(item);
+        const qty = this.inventory.qtyForItemInScope(item.id);
+        const hasAlert = updated.some(
+          t => t.category === 'LOW_STOCK' && t.itemId === item.id && t.status !== 'COMPLETED'
+        );
+        if (min > 0 && qty < min && !hasAlert) {
+          newTasks.push({
+            id: `LOW-${Date.now()}-${item.id}`,
+            itemId: item.id,
+            title: `Low stock: ${item.name} (Have ${qty}, Min ${min})`,
+            qty: min,
+            status: 'BREACHED',
+            dueDate: nowIso.slice(0, 10),
+            createdAt: nowIso,
+            assignee: 'Tarun (CEO)',
+            category: 'LOW_STOCK'
+          });
+        }
+      }
+      return [...newTasks, ...updated];
+    });
   }
 
   updateTask(id: string, status: TaskStatus, reason?: string) {
     const task = this.tasks().find(t => t.id === id);
     if (!task) return;
 
-    if (status === 'COMPLETED') {
+    if (status === 'COMPLETED' && task.category !== 'INVENTORY_DISPATCH') {
       this.inventory.addStock(task.itemId, task.qty);
       const item = this.inventory.getItem(task.itemId);
       this.audit.add(

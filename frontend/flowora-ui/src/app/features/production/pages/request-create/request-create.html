@@ -7,7 +7,7 @@
       </div>
       <div class="fx-head-actions">
         <a class="fx-btnlink fx-btn-ghost" routerLink="/production/requests">Back</a>
-        <button class="btn" (click)="save()">Save (mock)</button>
+        <button class="btn" (click)="save()">Save</button>
       </div>
     </div>
 
@@ -15,15 +15,15 @@
       <label>
         <span>Type</span>
         <select [ngModel]="form().type" (ngModelChange)="updateForm('type', $event)">
-          <option value="ISSUE">Inventory Issue</option>
-          <option value="PURCHASE">Purchase</option>
+          <option *ngFor="let t of typeOptions" [value]="t.value">{{ t.label }}</option>
         </select>
+        <div class="fx-sub">{{ typeHint() }}</div>
       </label>
 
       <label>
         <span>Final Product</span>
         <select [ngModel]="form().productId" (ngModelChange)="updateForm('productId', $event)">
-          <option *ngFor="let p of products" [value]="p.id">{{ p.name }}</option>
+          <option *ngFor="let p of products()" [value]="p.id">{{ p.name }} — {{ p.sku }}</option>
         </select>
       </label>
 
@@ -51,9 +51,9 @@
     <h3>Lines</h3>
     <div class="line" *ngFor="let l of form().lines; index as i">
       <select [ngModel]="l.itemId" (ngModelChange)="updateLine(i, 'itemId', $event)">
-        <option *ngFor="let it of items" [value]="it.id">{{ it.name }}</option>
+        <option *ngFor="let it of items()" [value]="it.id">{{ it.name }} — {{ it.sku }}</option>
       </select>
-      <input type="number" min="1" [ngModel]="l.qty" (ngModelChange)="updateLine(i, 'qty', +$event)" />
+      <input type="text" inputmode="decimal" pattern="[0-9]*" [ngModel]="l.qty" (ngModelChange)="updateLine(i, 'qty', $event)" />
       <select [ngModel]="l.reason" (ngModelChange)="updateLine(i, 'reason', $event)">
         <option value="">Reason (optional)</option>
         <option *ngFor="let r of reasonSeeds()" [value]="r">{{ r }}</option>
@@ -65,6 +65,13 @@
     <div class="add-reason">
       <input placeholder="Add custom reason" [ngModel]="form().newReason" (ngModelChange)="updateForm('newReason', $event)" />
       <button class="btn ghost" type="button" (click)="addReason()">Add Reason</button>
+    </div>
+
+    <div class="grid">
+      <label class="full">
+        <span>Description</span>
+        <textarea rows="2" placeholder="Add notes for this request (e.g., line priority, customer, BOM stage)" [ngModel]="form().description" (ngModelChange)="updateForm('description', $event)"></textarea>
+      </label>
     </div>
   </section>
 </div>

@@ -1,13 +1,12 @@
-package com.flowora.api;
+package com.opscontrol.api;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class FloworaApiApplication {
+public class OpsControlApiApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(FloworaApiApplication.class, args);
+		SpringApplication.run(OpsControlApiApplication.class, args);
 	}
-
 }

@@ -71,7 +71,7 @@
       <tbody>
       <tr class="fx-tr" *ngFor="let r of v.requests">
         <td class="fx-td fx-mono">{{ r.id }}</td>
-        <td class="fx-td">{{ r.type === 'ISSUE' ? 'Inventory Issue' : 'Purchase' }}</td>
+        <td class="fx-td">{{ r.type === 'ISSUE' ? 'Inventory Dispatch' : 'Purchase' }}</td>
         <td class="fx-td">{{ r.targetQty }}</td>
         <td class="fx-td">{{ totalApproved(r.lines) }}</td>
         <td class="fx-td">{{ r.totals.used }}</td>

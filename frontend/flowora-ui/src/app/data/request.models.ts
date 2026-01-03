@@ -32,6 +32,7 @@ export type ProductionRequest = {
   closedAt?: string;
   docs?: Attachment[];
   approvals?: Approval[];
+  description?: string;
 };
 
 export type ProductionRequestLine = {

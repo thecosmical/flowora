@@ -71,13 +71,13 @@ export class RequestDetailComponent {
     return allowed && req.approvers.includes(user.name);
   }
 
-  approveMock() {
+  async approve() {
     const user = this.userCtx.current();
-    this.store.approve(this.reqId, user.name, user.role);
+    await this.store.approve(this.reqId, user.name, user.role);
   }
 
-  rejectMock() {
+  async reject() {
     const user = this.userCtx.current();
-    this.store.reject(this.reqId, user.name, user.role);
+    await this.store.reject(this.reqId, user.name, user.role);
   }
 }

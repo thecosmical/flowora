@@ -3,13 +3,13 @@
     <div class="fx-head">
       <div>
         <h2 class="fx-title">{{ r.id }} • {{ productInfo?.name ?? 'Product' }}</h2>
-        <div class="fx-sub">Type: {{ r.type === 'ISSUE' ? 'Inventory Issue' : 'Purchase' }} • Requested by {{ r.requestedBy }}</div>
+        <div class="fx-sub">Type: {{ r.type === 'ISSUE' ? 'Inventory Dispatch' : 'Purchase' }} • Requested by {{ r.requestedBy }}</div>
       </div>
       <div class="fx-head-actions">
         <span class="fx-pill" [ngClass]="r.status.toLowerCase()">{{ r.status }}</span>
         <a class="fx-btnlink fx-btn-ghost" routerLink="/production/requests">Back</a>
-        <button class="btn" *ngIf="canApprove(r.status)" (click)="approveMock()">Approve</button>
-        <button class="btn ghost" *ngIf="canApprove(r.status)" (click)="rejectMock()">Reject</button>
+        <button class="btn" *ngIf="canApprove(r.status)" (click)="approve()">Approve</button>
+        <button class="btn ghost" *ngIf="canApprove(r.status)" (click)="reject()">Reject</button>
       </div>
     </div>
 
@@ -21,6 +21,10 @@
       <div class="card">
         <div class="label">Approved By</div>
         <div class="value">{{ r.approvedBy?.join(', ') || 'Pending' }}</div>
+      </div>
+      <div class="card" *ngIf="r.description">
+        <div class="label">Description</div>
+        <div class="value">{{ r.description }}</div>
       </div>
       <div class="card">
         <div class="label">Docs</div>

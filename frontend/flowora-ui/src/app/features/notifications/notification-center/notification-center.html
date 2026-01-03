@@ -25,6 +25,7 @@
       <thead>
       <tr>
         <th class="fx-th">Title</th>
+        <th class="fx-th">Category</th>
         <th class="fx-th">Item</th>
         <th class="fx-th">HSN/SAC</th>
         <th class="fx-th">Qty</th>
@@ -39,6 +40,7 @@
       <ng-container *ngFor="let t of tasks()">
         <tr class="fx-tr">
           <td class="fx-td">{{ t.title }}</td>
+          <td class="fx-td">{{ t.category || 'GENERAL' }}</td>
           <td class="fx-td">
             <div>{{ t.item?.name ?? t.itemId }}</div>
             <div class="fx-sub">{{ t.item?.sku }}</div>
@@ -56,7 +58,7 @@
           </td>
         </tr>
         <tr class="fx-detail" *ngIf="openId() === t.id">
-          <td class="fx-td" colspan="6">
+          <td class="fx-td" colspan="9">
             <div class="detail-card">
               <div class="detail-row">
                 <div><strong>Assignee:</strong> {{ t.assignee || 'Unassigned' }}</div>
@@ -67,15 +69,97 @@
                 <button class="btn" type="button" (click)="action(t.id, 'RECEIVED')">Mark Received</button>
                 <button class="btn" type="button" (click)="action(t.id, 'COMPLETED')">Mark Done</button>
                 <button class="btn ghost" type="button" (click)="action(t.id, 'REJECTED')">Reject</button>
+                <div class="rfq-actions" *ngIf="t.item">
+                  <button class="btn ghost" type="button" (click)="openRfq(t.id, 'SMS')">RFQ via SMS</button>
+                  <button class="btn ghost" type="button" (click)="openRfq(t.id, 'EMAIL')">RFQ via Email</button>
+                </div>
               </div>
+
             </div>
           </td>
         </tr>
       </ng-container>
       <tr *ngIf="tasks().length === 0">
-        <td class="fx-td fx-empty" colspan="6">No messages.</td>
+        <td class="fx-td fx-empty" colspan="9">No messages.</td>
       </tr>
       </tbody>
     </table>
   </section>
+
+  <div class="rfq-overlay" *ngIf="rfqTask() as rfqTask">
+    <div class="rfq-modal">
+      <div class="rfq-header">
+        <div>
+          <div class="pill">RFQ</div>
+          <h3>Request for Quotation</h3>
+          <div class="rfq-sub">Item {{ rfqTask.item?.name ?? rfqTask.itemId }} · SKU {{ rfqTask.item?.sku || '-' }}</div>
+        </div>
+        <button class="close" type="button" (click)="closeRfq()">×</button>
+      </div>
+
+      <div class="rfq-meta">
+        <div><strong>Qty:</strong> {{ rfqTask.qty }}</div>
+        <div><strong>Request:</strong> {{ rfqTask.requestId || 'N/A' }}</div>
+        <div><strong>Requester:</strong> {{ rfqRequest()?.requestedBy || '-' }}</div>
+        <div><strong>Due:</strong> {{ rfqTask.dueDate }}</div>
+      </div>
+
+      <div class="rfq-form">
+        <div class="row">
+          <label>
+            <span>Channel</span>
+            <select [ngModel]="rfqChannel()" (ngModelChange)="rfqChannel.set($event)">
+              <option value="SMS">SMS</option>
+              <option value="EMAIL">Email</option>
+            </select>
+          </label>
+          <label>
+            <span>Template</span>
+            <select [ngModel]="rfqTemplate()" (ngModelChange)="rfqTemplate.set($event); applyTemplate(rfqChannel())">
+              <ng-container *ngIf="rfqChannel() === 'SMS'">
+                <option *ngFor="let tpl of messaging.smsTemplates()" [value]="tpl.id">{{ tpl.name }}</option>
+              </ng-container>
+              <ng-container *ngIf="rfqChannel() === 'EMAIL'">
+                <option *ngFor="let tpl of messaging.emailTemplates()" [value]="tpl.id">{{ tpl.name }}</option>
+              </ng-container>
+            </select>
+          </label>
+          <label>
+            <span>From</span>
+            <input [ngModel]="rfqFrom()" (ngModelChange)="rfqFrom.set($event)" />
+          </label>
+        </div>
+
+        <div class="row">
+          <label>
+            <span>To (comma separated)</span>
+            <input [ngModel]="rfqTo()" (ngModelChange)="rfqTo.set($event)" />
+          </label>
+          <label *ngIf="rfqChannel() === 'EMAIL'">
+            <span>CC</span>
+            <input [ngModel]="rfqCc()" (ngModelChange)="rfqCc.set($event)" />
+          </label>
+        </div>
+
+        <div class="row" *ngIf="rfqChannel() === 'EMAIL'">
+          <label class="full">
+            <span>Subject</span>
+            <input [ngModel]="rfqSubject()" (ngModelChange)="rfqSubject.set($event)" />
+          </label>
+        </div>
+
+        <div class="row">
+          <label class="full">
+            <span>{{ rfqChannel() === 'SMS' ? 'Message' : 'Body' }}</span>
+            <textarea rows="6" [ngModel]="rfqBody()" (ngModelChange)="rfqBody.set($event)"></textarea>
+          </label>
+        </div>
+
+        <div class="rfq-actions-bar">
+          <button class="btn" type="button" (click)="sendRfq()">Send {{ rfqChannel() }}</button>
+          <button class="btn ghost" type="button" (click)="closeRfq()">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>

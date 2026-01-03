@@ -7,12 +7,12 @@ import tasksMock from '../data/api/tasks.json';
 import auditMock from '../data/api/audit.json';
 import rolesMock from '../data/api/roles.json';
 import { API_CONFIG, ApiConfig } from './api-config';
-import { Batch, Item, Location, Movement, StockRow } from '../data/inventory.models';
+import { Batch, Item, Location, Movement, Status, StockRow } from '../data/inventory.models';
 import { ApprovalRule, ConsumptionEvent, ProductionRequest, ProductionRequestLine, RequestType } from '../data/request.models';
 import { AuditLog } from './audit-store';
 import { TaskStatus } from './decision-store';
 
-type InventoryResponse = {
+export type InventoryResponse = {
   items: Item[];
   batches: Batch[];
   stock: StockRow[];
@@ -20,12 +20,12 @@ type InventoryResponse = {
   movements: Movement[];
 };
 
-type RequestsResponse = {
+export type RequestsResponse = {
   products: {
     id: string;
     name: string;
     sku: string;
-    status: string;
+    status: Status;
     uom: string;
     category: string;
     description?: string;
@@ -36,7 +36,7 @@ type RequestsResponse = {
   approvalRules: ApprovalRule[];
 };
 
-type TasksResponse = {
+export type TasksResponse = {
   tasks: {
     id: string;
     itemId: string;
@@ -47,12 +47,14 @@ type TasksResponse = {
     createdAt: string;
     assignee?: string;
     reason?: string;
+    category?: string;
+    requestId?: string;
   }[];
 };
 
-type AuditResponse = { entries: AuditLog[] };
+export type AuditResponse = { entries: AuditLog[] };
 
-type RolesResponse = {
+export type RolesResponse = {
   roles: {
     id: string;
     name: string;
@@ -120,6 +122,11 @@ export class ApiClientService {
   approveRequest(requestId: string, payload: { by: string; role: string; comment?: string }): Observable<void> {
     if (this.config.useMock) return this.mock(void 0);
     return this.http.post<void>(this.url(`/api/requests/${requestId}/approve`), payload, { headers: this.headers() });
+  }
+
+  rejectRequest(requestId: string, payload: { by: string; role: string; comment?: string }): Observable<void> {
+    if (this.config.useMock) return this.mock(void 0);
+    return this.http.post<void>(this.url(`/api/requests/${requestId}/reject`), payload, { headers: this.headers() });
   }
 
   listTasks(): Observable<TasksResponse> {

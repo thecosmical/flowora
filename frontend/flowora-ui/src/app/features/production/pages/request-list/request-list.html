@@ -31,7 +31,7 @@
         <span>Type</span>
         <select class="fx-select" [value]="type()" (change)="type.set($any($event.target).value)">
           <option value="ALL">All types</option>
-          <option value="ISSUE">Inventory Issue</option>
+          <option value="ISSUE">Inventory Dispatch</option>
           <option value="PURCHASE">Purchase</option>
         </select>
       </label>
@@ -56,12 +56,12 @@
       <tbody>
       <ng-container *ngFor="let r of rows()">
         <tr class="fx-tr">
-          <td class="fx-td fx-mono">{{ r.id }}</td>
-          <td class="fx-td">
-            <div><a class="fx-btnlink" [routerLink]="['/production/product', r.product?.id]">{{ r.product?.name ?? 'Product' }}</a></div>
-            <div class="fx-sub">{{ r.product?.sku }}</div>
-          </td>
-          <td class="fx-td">{{ r.type === 'ISSUE' ? 'Inventory Issue' : 'Purchase' }}</td>
+        <td class="fx-td fx-mono">{{ r.id }}</td>
+        <td class="fx-td">
+          <div><a class="fx-btnlink" [routerLink]="['/production/product', r.product?.id]">{{ r.product?.name ?? 'Product' }}</a></div>
+          <div class="fx-sub">{{ r.product?.sku }}</div>
+        </td>
+        <td class="fx-td">{{ r.type === 'ISSUE' ? 'Inventory Dispatch' : 'Purchase' }}</td>
           <td class="fx-td">{{ r.targetQty }}</td>
           <td class="fx-td">{{ r.totals.approved }}</td>
           <td class="fx-td">{{ r.totals.used }}</td>

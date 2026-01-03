@@ -7,7 +7,7 @@
   },
   "newProjectRoot": "projects",
   "projects": {
-    "flowora-ui": {
+    "opscontrol-ui": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
@@ -63,10 +63,10 @@
           "builder": "@angular/build:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "flowora-ui:build:production"
+              "buildTarget": "opscontrol-ui:build:production"
             },
             "development": {
-              "buildTarget": "flowora-ui:build:development"
+              "buildTarget": "opscontrol-ui:build:development"
             }
           },
           "defaultConfiguration": "development"
