@@ -1,0 +1,69 @@
+.purchase-filters .grow { flex: 1; min-width: 260px; }
+
+.summary-bar {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin: 14px 0;
+}
+
+.chip {
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: #f8fafc;
+  border: 1px solid var(--color-border);
+  display: grid;
+  gap: 4px;
+  min-width: 160px;
+}
+
+.chip .label { color: var(--color-text-muted); font-size: 12px; }
+.chip .value { font-weight: 700; color: var(--color-text); }
+.chip.highlight { background: #ecfeff; border-color: #a5f3fc; color: #0f172a; }
+
+.insight-card {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  padding: 12px 14px;
+  background: linear-gradient(90deg, #f9fafb 0%, #ecfeff 100%);
+  border: 1px solid var(--color-border);
+  border-radius: 14px;
+  margin-bottom: 10px;
+}
+
+.insight-card .pill {
+  background: #0ea5e9;
+  color: #fff;
+  border-radius: 12px;
+  padding: 6px 10px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.insight-card .copy { color: #0f172a; font-size: 14px; }
+
+.purchase-table .supplier { font-weight: 700; }
+.fx-pill.status.awaiting_grn { color: #b45309; background: #fff7ed; border-color: #fed7aa; }
+.fx-pill.status.ready_for_payment { color: #1d4ed8; background: #eff6ff; border-color: #bfdbfe; }
+.fx-pill.status.paid { color: #047857; background: #ecfdf3; border-color: #a7f3d0; }
+
+.action-group { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+.pill-btn { border: 1px solid var(--color-border); background: #fff; border-radius: 10px; padding: 8px 10px; cursor: pointer; }
+.pill-btn:hover { border-color: var(--color-primary); }
+
+.fx-detail .detail-card {
+  background: #fdfefe;
+  border: 1px solid var(--border-soft);
+  border-radius: 12px;
+  padding: 12px;
+  box-shadow: var(--shadow-xs);
+  display: grid;
+  gap: 10px;
+}
+
+.detail-row { display: flex; gap: 12px; flex-wrap: wrap; font-size: 13px; }
+.line-head { font-weight: 700; font-size: 13px; color: var(--ink-500); }
+.line-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 8px; font-size: 13px; align-items: center; }
+.line-item { display: grid; gap: 4px; }
+.reason { color: var(--ink-500); }

@@ -1,0 +1,221 @@
+<div class="fx-container">
+  <section class="fx-card fx-pad">
+    <div class="fx-head">
+      <div>
+        <h2 class="fx-title">Leads Management</h2>
+        <div class="fx-sub">When a lead is confirmed, decide how much to dispatch from finished goods vs manufacture.</div>
+      </div>
+      <div class="fx-head-actions">
+        <a class="fx-btn ghost small" routerLink="/inventory">Back to Inventory</a>
+      </div>
+    </div>
+
+    <div class="fx-row stats">
+      <button class="stat-chip" [class.active]="activeFilter().type === 'ALL'" (click)="activeFilter.set({ type: 'ALL' })">
+        <div class="label">Total intakes</div>
+        <div class="value">{{ summary().total }}</div>
+      </button>
+      <button class="stat-chip ok" [class.active]="activeFilter().type === 'STATUS' && activeFilter().value === 'Won'" (click)="activeFilter.set({ type: 'STATUS', value: 'Won' })">
+        <div class="label">Won</div>
+        <div class="value">{{ summary().won }}</div>
+      </button>
+      <button class="stat-chip loss" [class.active]="activeFilter().type === 'STATUS' && activeFilter().value === 'Lost'" (click)="activeFilter.set({ type: 'STATUS', value: 'Lost' })">
+        <div class="label">Lost</div>
+        <div class="value">{{ summary().lost }}</div>
+      </button>
+      <button class="stat-chip" *ngFor="let s of sources" [class.active]="activeFilter().type === 'SOURCE' && activeFilter().value === s" (click)="activeFilter.set({ type: 'SOURCE', value: s })">
+        <div class="label">{{ s }}</div>
+        <div class="value">{{ summary().bySource[s] || 0 }}</div>
+      </button>
+    </div>
+
+    <div class="fx-card fx-pad add-lead">
+      <div class="fx-head">
+        <div>
+          <h3 class="fx-title">Add lead (mock)</h3>
+          <div class="fx-sub">Sources: Direct call, IndiaMART API, Trade India, Website, LinkedIn, Referral, Retained customer, Other.</div>
+        </div>
+        <button class="fx-btn small" type="button" (click)="addLead()">Save lead</button>
+      </div>
+      <div class="fx-row add-grid">
+        <label class="fx-input-group">
+          <span>Customer</span>
+          <input class="fx-input" [ngModel]="newLead().customer" (ngModelChange)="setNewLead('customer', $event)" placeholder="Customer name" />
+        </label>
+        <label class="fx-input-group">
+          <span>Item</span>
+          <select class="fx-select" [ngModel]="newLead().itemId" (ngModelChange)="setNewLead('itemId', $event)">
+            <option *ngFor="let it of inventory.items()" [ngValue]="it.id">{{ it.name }} ({{ it.sku }})</option>
+          </select>
+        </label>
+        <label class="fx-input-group">
+          <span>Qty</span>
+          <input class="fx-input" type="number" min="1" [ngModel]="newLead().qty" (ngModelChange)="setNewLead('qty', +$event)" />
+        </label>
+        <label class="fx-input-group">
+          <span>Due date</span>
+          <input class="fx-input" type="date" [ngModel]="newLead().dueDate" (ngModelChange)="setNewLead('dueDate', $event)" />
+        </label>
+        <label class="fx-input-group">
+          <span>Source</span>
+          <select class="fx-select" [ngModel]="newLead().source" (ngModelChange)="setNewLead('source', $event)">
+            <option *ngFor="let s of sources" [ngValue]="s">{{ s }}</option>
+          </select>
+        </label>
+        <label class="fx-input-group">
+          <span>Status</span>
+          <select class="fx-select" [ngModel]="newLead().status" (ngModelChange)="setNewLead('status', $event)">
+            <option [ngValue]="'Won'">Won</option>
+            <option [ngValue]="'Lost'">Lost</option>
+          </select>
+        </label>
+        <label class="fx-input-group">
+          <span>Reason</span>
+          <select class="fx-select" [ngModel]="newLead().reason" (ngModelChange)="handleReasonSelect($event)">
+            <option *ngFor="let r of reasons()" [ngValue]="r">{{ r }}</option>
+            <option [ngValue]="'__add__'">+ Add new reason…</option>
+          </select>
+          <div class="inline-add" *ngIf="addReasonMode()">
+            <input class="fx-input" [ngModel]="newReason()" (ngModelChange)="newReason.set($event)" placeholder="Enter reason" />
+            <button class="fx-btn ghost small" type="button" (click)="confirmNewReason()">Add</button>
+            <button class="fx-btn ghost small" type="button" (click)="cancelNewReason()">Cancel</button>
+          </div>
+        </label>
+      </div>
+    </div>
+
+    <table class="fx-table lead-table">
+      <thead>
+      <tr>
+        <th class="fx-th">Intake</th>
+        <th class="fx-th">Item</th>
+        <th class="fx-th">Finished Goods</th>
+        <th class="fx-th">Dispatch</th>
+        <th class="fx-th">To Manufacture</th>
+        <th class="fx-th">ETA / Expiry</th>
+        <th class="fx-th">Status</th>
+        <th class="fx-th">Source</th>
+        <th class="fx-th">Reason</th>
+        <th class="fx-th">Suggested Reorder</th>
+        <th class="fx-th"></th>
+      </tr>
+      </thead>
+      <tbody>
+      <ng-container *ngFor="let r of rows()">
+        <tr>
+          <td class="fx-td">
+            <div class="fx-strong">{{ r.lead.id }}</div>
+            <div class="fx-sub">{{ r.lead.customer }}</div>
+            <div class="fx-sub">Due: {{ r.lead.dueDate }}</div>
+          </td>
+          <td class="fx-td">
+            <div class="fx-strong">{{ r.item?.name || r.lead.itemId }}</div>
+            <div class="fx-sub">SKU {{ r.item?.sku || '-' }} · {{ r.item?.uom || '' }}</div>
+          </td>
+          <td class="fx-td fx-num">
+            {{ r.available }} {{ r.item?.uom }}
+            <div class="fx-sub" *ngIf="r.expired">Old lot present (expires {{ r.earliest }})</div>
+          </td>
+          <td class="fx-td fx-num">{{ r.dispatch }} {{ r.item?.uom }}</td>
+          <td class="fx-td fx-num">{{ r.toProduce }} {{ r.item?.uom }}</td>
+          <td class="fx-td">
+            <div *ngIf="r.leadDays">ETA ~ {{ r.leadDays }} days</div>
+            <div class="fx-sub">Earliest exp: {{ r.earliest || '—' }}</div>
+          </td>
+          <td class="fx-td">
+            <span class="fx-pill ok" *ngIf="r.toProduce === 0">Can dispatch fully</span>
+            <span class="fx-pill warn" *ngIf="r.dispatch > 0 && r.toProduce > 0">Partial dispatch</span>
+            <span class="fx-pill stockout" *ngIf="r.dispatch === 0 && r.toProduce > 0">Manufacture only</span>
+          </td>
+          <td class="fx-td">
+            <div>{{ r.lead.source }}</div>
+            <div class="fx-sub">{{ r.lead.status }}</div>
+          </td>
+          <td class="fx-td">
+            <div>{{ r.lead.reason || '—' }}</div>
+          </td>
+          <td class="fx-td">
+            <div *ngIf="r.rec">
+              {{ r.rec.suggestedQty }} units • {{ r.rec.risk }} risk
+            </div>
+            <div class="fx-sub" *ngIf="r.rec">{{ r.rec.rationale }}</div>
+          </td>
+          <td class="fx-td fx-num">
+            <button class="fx-btn ghost small" type="button" (click)="toggle(r.lead.id)">
+              {{ openId() === r.lead.id ? 'Hide' : 'Details' }}
+            </button>
+          </td>
+        </tr>
+        <tr class="lead-detail" *ngIf="openId() === r.lead.id">
+          <td class="fx-td" colspan="11">
+            <div class="detail-card">
+              <div class="detail-head">
+                <div class="detail-title">{{ r.statusLabel }}</div>
+                <div class="fx-sub">{{ r.statusReason }}</div>
+              </div>
+              <div class="detail-grid">
+                <div class="metric">
+                  <div class="label">Order qty</div>
+                  <div class="value">{{ r.lead.qty }} {{ r.item?.uom }}</div>
+                </div>
+                <div class="metric">
+                  <div class="label">Finished goods</div>
+                  <div class="value">{{ r.available }} {{ r.item?.uom }}</div>
+                </div>
+                <div class="metric">
+                  <div class="label">Dispatch now</div>
+                  <div class="value">{{ r.dispatch }} {{ r.item?.uom }}</div>
+                </div>
+                <div class="metric">
+                  <div class="label">Manufacture</div>
+                  <div class="value">{{ r.toProduce }} {{ r.item?.uom }}</div>
+                </div>
+                <div class="metric">
+                  <div class="label">Raw Item Shortages</div>
+                  <div class="value">
+                    <ng-container *ngIf="r.rawShortages.length; else rawOk">
+                      <ul class="raw-list">
+                        <li *ngFor="let s of r.rawShortages">
+                          <span class="name">{{ s.name }}</span>
+                          <span class="qty">Need {{ s.required }} {{ s.uom }}, have {{ s.available }}, short {{ s.shortfall }}</span>
+                        </li>
+                      </ul>
+                    </ng-container>
+                    <ng-template #rawOk>None flagged</ng-template>
+                  </div>
+                </div>
+                <div class="metric">
+                  <div class="label">SLA</div>
+                  <div class="value">
+                    <span class="fx-pill" [ngClass]="r.sla.tone">{{ r.sla.label }}</span>
+                  </div>
+                </div>
+              </div>
+              <div class="detail-actions">
+                <button class="fx-btn small" type="button" (click)="triggerAction('RESERVE')" [disabled]="r.dispatch === 0">Reserve finished goods</button>
+                <button class="fx-btn small" type="button" (click)="triggerAction('WORK_ORDER')" [disabled]="r.toProduce === 0">Create work order</button>
+                <button class="fx-btn small" type="button" (click)="triggerAction('RAW')" [disabled]="!r.rawShortages.length">Request raw items</button>
+              </div>
+            </div>
+          </td>
+        </tr>
+      </ng-container>
+      </tbody>
+    </table>
+
+    <div class="fx-card fx-pad reason-card">
+      <div class="fx-head">
+        <div>
+          <h3 class="fx-title">Top lost reasons</h3>
+          <div class="fx-sub">Ops view of why deals slip.</div>
+        </div>
+      </div>
+      <div class="reason-grid">
+        <button class="reason-chip loss" *ngFor="let r of reasonCounts()" (click)="reasonFilter.set(r.reason)">
+          <div class="label">{{ r.reason }}</div>
+          <div class="value">{{ r.count }}</div>
+        </button>
+      </div>
+    </div>
+  </section>
+</div>

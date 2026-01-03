@@ -1,0 +1,166 @@
+<div class="fx-container">
+  <section class="fx-head">
+    <div>
+      <h2 class="fx-title">Purchase Orders</h2>
+      <div class="fx-sub">Supplier quotations converted to orders — supplier, spend, arrival, and owner in one view.</div>
+    </div>
+    <div class="fx-head-actions">
+      <button class="fx-btn ghost small" type="button">Export</button>
+      <a class="fx-btn small" routerLink="/procurement/purchases/new">+ Create Purchase Order</a>
+      <a class="fx-btn ghost small" routerLink="/procurement/purchases/received">Already Purchased Orders</a>
+    </div>
+  </section>
+
+  <div class="fx-row filters purchase-filters">
+    <label class="fx-input-group">
+      <span>Timeframe</span>
+      <select class="fx-select" [value]="horizon()" (change)="horizon.set($any($event.target).value)">
+        <option value="THIS_MONTH">This month</option>
+        <option value="LAST_30">Last 30 days</option>
+        <option value="THIS_QUARTER">This quarter</option>
+      </select>
+    </label>
+
+    <label class="fx-input-group">
+      <span>Status</span>
+      <select class="fx-select" [value]="status()" (change)="status.set($any($event.target).value)">
+        <option *ngFor="let s of statuses" [value]="s">{{ s === 'ALL' ? 'All' : s }}</option>
+      </select>
+    </label>
+
+    <label class="fx-input-group">
+      <span>Branch</span>
+      <select class="fx-select" [value]="branch()" (change)="branch.set($any($event.target).value)">
+        <option *ngFor="let b of branches()" [value]="b">{{ b }}</option>
+      </select>
+    </label>
+
+    <label class="fx-input-group">
+      <span>Owner</span>
+      <select class="fx-select" [value]="buyer()" (change)="buyer.set($any($event.target).value)">
+        <option *ngFor="let b of buyers()" [value]="b">{{ b }}</option>
+      </select>
+    </label>
+
+    <label class="fx-input-group grow">
+      <span>Search supplier / Purchase Order / Quotation</span>
+      <input class="fx-input" [value]="search()" (input)="search.set(($any($event.target)).value)" placeholder="Acme Steel, Purchase Order ID, Quotation ID..." />
+    </label>
+  </div>
+
+  <div class="summary-bar">
+    <div class="chip">
+      <span class="label">Orders</span>
+      <span class="value">{{ summary().count }}</span>
+    </div>
+    <div class="chip">
+      <span class="label">Pre-tax</span>
+      <span class="value">{{ formatCurrency(summary().taxable) }}</span>
+    </div>
+    <div class="chip">
+      <span class="label">Total</span>
+      <span class="value">{{ formatCurrency(summary().total) }}</span>
+    </div>
+    <div class="chip highlight" *ngIf="rows()[0] as next">
+      <span class="label">Next arrival</span>
+      <span class="value">{{ etaBadge(next) }}</span>
+    </div>
+  </div>
+
+  <div class="insight-card">
+    <div class="pill">After Quotation</div>
+    <div class="copy">
+      <strong>Ops + Procurement</strong> can spin a purchase request the moment a supplier shares the best quote. We keep the quotation reference and line notes so approvals, receipts, and GRNs stay audit-friendly.
+    </div>
+  </div>
+
+  <table class="fx-table purchase-table">
+    <thead>
+    <tr>
+      <th class="fx-th">Purchase Order / Quotation</th>
+      <th class="fx-th">Supplier</th>
+      <th class="fx-th">Contact</th>
+      <th class="fx-th">Status</th>
+      <th class="fx-th">Ordered</th>
+      <th class="fx-th">Expected</th>
+      <th class="fx-th fx-num">Pre-tax (₹)</th>
+      <th class="fx-th fx-num">Total (₹)</th>
+      <th class="fx-th">Owner</th>
+      <th class="fx-th fx-num">Actions</th>
+    </tr>
+    </thead>
+    <tbody>
+    <ng-container *ngFor="let r of rows()">
+      <tr class="fx-tr">
+        <td class="fx-td">
+          <div class="mono">{{ r.poNumber }}</div>
+          <div class="fx-sub">{{ r.rfqRef ? 'Quotation: ' + r.rfqRef : 'Quotation not linked' }}</div>
+        </td>
+        <td class="fx-td">
+          <div class="supplier">{{ r.supplier }}</div>
+          <div class="fx-sub">{{ r.branch }}</div>
+          <div class="tags" *ngIf="r.tags?.length">
+            <span class="tag" *ngFor="let t of r.tags">{{ t }}</span>
+          </div>
+        </td>
+        <td class="fx-td">
+          <div>{{ r.contact }}</div>
+          <div class="fx-sub">{{ r.contactPhone }}</div>
+        </td>
+        <td class="fx-td">
+          <span class="fx-pill status" [ngClass]="r.status.toLowerCase()">{{ r.status }}</span>
+        </td>
+        <td class="fx-td fx-mono">{{ r.orderedOn }}</td>
+        <td class="fx-td">
+          <div>{{ r.expectedOn }}</div>
+          <div class="fx-sub">{{ etaBadge(r) }}</div>
+        </td>
+        <td class="fx-td fx-num">{{ formatCurrency(r.taxableValue) }}</td>
+        <td class="fx-td fx-num">{{ formatCurrency(r.totalValue) }}</td>
+        <td class="fx-td">
+          <div>{{ r.createdBy }}</div>
+          <div class="fx-sub">{{ r.buyer }}</div>
+        </td>
+        <td class="fx-td fx-num">
+          <div class="action-group">
+            <button class="pill-btn" type="button" (click)="toggle(r.id)">{{ openId() === r.id ? 'Hide details' : 'Details' }}</button>
+            <button class="pill-btn" type="button" (click)="moveTo(r.id, 'PENDING')" *ngIf="r.status === 'DRAFT'">Submit</button>
+            <button class="pill-btn" type="button" (click)="moveTo(r.id, 'ORDERED')" *ngIf="r.status === 'DRAFT' || r.status === 'PENDING'">Mark ordered</button>
+            <button class="pill-btn" type="button" (click)="moveTo(r.id, 'INBOUND')" *ngIf="r.status === 'ORDERED' || r.status === 'PENDING'">Mark in transit</button>
+            <button class="pill-btn" type="button" (click)="moveTo(r.id, 'RECEIVED')" *ngIf="r.status === 'INBOUND'">Mark received</button>
+          </div>
+        </td>
+      </tr>
+      <tr class="fx-detail" *ngIf="openId() === r.id">
+        <td class="fx-td" colspan="10">
+          <div class="detail-card">
+            <div class="detail-row">
+              <div><strong>Quotation:</strong> {{ r.rfqRef || '—' }}</div>
+              <div><strong>Branch:</strong> {{ r.branch }}</div>
+              <div><strong>Contact:</strong> {{ r.contact }} · {{ r.contactPhone || r.contactEmail || '-' }}</div>
+              <div><strong>Notes:</strong> {{ r.notes || '—' }}</div>
+            </div>
+            <div class="line-head">Lines</div>
+            <div class="line-row" *ngFor="let l of r.lines">
+              <div class="line-item">
+                <div class="mono">{{ l.sku }}</div>
+                <div>{{ l.name }}</div>
+              </div>
+              <span>HSN {{ l.hsn || '-' }}</span>
+              <span>Qty {{ l.qty }} {{ l.uom }}</span>
+              <span>Rate {{ formatCurrency(l.rate, 'INR', 0) }}</span>
+              <span>Discount {{ (l.discount || 0) | number:'1.0-0' }}</span>
+              <span>Tax {{ l.taxRate || 0 }}%</span>
+              <span class="reason">Est {{ formatCurrency((l.qty * l.rate) - (l.discount || 0), 'INR', 0) }}</span>
+            </div>
+            <div class="note" *ngIf="r.notes">{{ r.notes }}</div>
+          </div>
+        </td>
+      </tr>
+    </ng-container>
+    <tr *ngIf="rows().length === 0">
+      <td class="fx-td fx-empty" colspan="10">No purchase orders match the filters.</td>
+    </tr>
+    </tbody>
+  </table>
+</div>

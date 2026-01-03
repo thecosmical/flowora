@@ -1,0 +1,265 @@
+<div class="fx-container">
+  <div class="fx-head">
+    <div>
+      <h2 class="fx-title">Create Purchase Order</h2>
+      <div class="fx-sub">Ops-facing capture: supplier routing, ETA promise, and handoff to stores.</div>
+    </div>
+    <div class="fx-head-actions">
+      <a routerLink="/procurement/purchases" class="fx-btn ghost small">Back to Orders</a>
+      <button class="fx-btn small" type="button" (click)="save(true)">Save</button>
+      <button class="fx-btn ghost small" type="button" (click)="save(false)">Save & Add Another</button>
+    </div>
+  </div>
+
+  <div class="ops-band">
+    <div class="chip">
+      <span class="label">Flow</span>
+      <strong>Request for Quotation → Purchase Order → Receiving</strong>
+    </div>
+    <div class="chip">
+      <span class="label">Owner</span>
+      <strong>{{ form().buyer }}</strong>
+    </div>
+    <div class="chip">
+      <span class="label">Tax Mode</span>
+      <strong>{{ form().taxMode === 'IGST' ? 'IGST' : 'CGST+SGST' }}</strong>
+    </div>
+    <div class="chip" *ngIf="bestSupplier() as best">
+      <span class="label">Best Quote</span>
+      <strong>{{ best.name }}</strong>
+    </div>
+  </div>
+
+  <section class="card basic-info">
+    <div class="section-head">
+      <div class="pill">Supplier & Document</div>
+      <div class="section-title">Supplier, branch, and references</div>
+      <button class="pill-btn" type="button" (click)="populateFromHistory()">Prefill from history</button>
+    </div>
+
+    <div class="quick-load">
+      <span>Quick load:</span>
+      <button class="pill-btn ghost" type="button" (click)="loadPreset('LAST_PO')">Last Purchase Order</button>
+      <button class="pill-btn ghost" type="button" (click)="loadPreset('AWARDED_RFQ')">Awarded Quotation</button>
+      <button class="pill-btn ghost" type="button" (click)="loadPreset('TEMPLATE')">Template</button>
+    </div>
+
+    <div class="basic-grid">
+      <div class="field-block wide-2">
+        <label>
+          <span>Supplier</span>
+          <select class="fx-select" [ngModel]="form().supplierId" (ngModelChange)="applySupplier($event)">
+            <option value="">Select supplier (best quote suggested)</option>
+            <option *ngFor="let s of supplierOptions()" [ngValue]="s.id">
+              {{ s.name }} — {{ s.contact }}
+            </option>
+          </select>
+          <div class="hint" *ngIf="bestSupplier() as best">Best quote fit: {{ best.name }}</div>
+        </label>
+      </div>
+      <label>
+        <span>Branch</span>
+        <input class="fx-input" [ngModel]="form().branch" (ngModelChange)="updateField('branch', $event)" />
+      </label>
+      <label>
+        <span>Quotation Reference</span>
+        <input class="fx-input" [ngModel]="form().rfqRef" (ngModelChange)="updateField('rfqRef', $event)" placeholder="Quotation ref / ID" />
+      </label>
+      <label>
+        <span>Status</span>
+        <select class="fx-select" [ngModel]="form().status" (ngModelChange)="updateField('status', $event)">
+          <option *ngFor="let s of statusOptions" [ngValue]="s">{{ s }}</option>
+        </select>
+      </label>
+      <label>
+        <span>Purchase Order Number</span>
+        <input class="fx-input" [ngModel]="form().poNumber" (ngModelChange)="updateField('poNumber', $event)" placeholder="Purchase Order ID" />
+      </label>
+      <label>
+        <span>Reference</span>
+        <input class="fx-input" [ngModel]="form().reference" (ngModelChange)="updateField('reference', $event)" placeholder="Internal ref / quote" />
+      </label>
+      <label>
+        <span>Order Date</span>
+        <input class="fx-input" type="date" [ngModel]="form().orderedOn" (ngModelChange)="updateField('orderedOn', $event)" />
+      </label>
+      <label>
+        <span>Due / Delivery Date</span>
+        <input class="fx-input" type="date" [ngModel]="form().expectedOn" (ngModelChange)="updateField('expectedOn', $event)" />
+      </label>
+    </div>
+    <div class="party-grid">
+      <label>
+        <span>Contact Person</span>
+        <input class="fx-input" [ngModel]="form().contact" (ngModelChange)="updateField('contact', $event)" placeholder="Priya Menon" />
+      </label>
+      <label>
+        <span>Contact Email</span>
+        <input class="fx-input" [ngModel]="form().contactEmail" (ngModelChange)="updateField('contactEmail', $event)" placeholder="priya@supplier.com" />
+      </label>
+      <label>
+        <span>Contact Phone</span>
+        <input class="fx-input" [ngModel]="form().contactPhone" (ngModelChange)="updateField('contactPhone', $event)" placeholder="+91 98xxxxxxx" />
+      </label>
+    </div>
+    <div class="party-grid">
+      <label class="block">
+        <span>Source Address</span>
+        <textarea class="fx-input" rows="2" [ngModel]="form().sourceAddress" (ngModelChange)="updateField('sourceAddress', $event)" placeholder="Branch / vendor pickup address"></textarea>
+      </label>
+      <label class="block">
+        <span>Shipping Details</span>
+        <textarea class="fx-input" rows="2" [ngModel]="form().shippingDetails" (ngModelChange)="updateField('shippingDetails', $event)" placeholder="Ship-to, consignee, GSTIN"></textarea>
+      </label>
+      <label>
+        <span>Tax Mode</span>
+        <select class="fx-select" [ngModel]="form().taxMode" (ngModelChange)="updateField('taxMode', $event)">
+          <option value="IGST">IGST</option>
+          <option value="CGST_SGST">CGST + SGST</option>
+        </select>
+      </label>
+      <label>
+        <span>Owner / Buyer</span>
+        <input class="fx-input" [ngModel]="form().buyer" (ngModelChange)="updateField('buyer', $event)" />
+      </label>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="section-head">
+      <div class="pill">Item List</div>
+      <div class="section-title">Lines, taxes, and amounts</div>
+      <button class="pill-btn" type="button" (click)="addLine()">+ Add Item</button>
+    </div>
+    <div class="line-table">
+      <div class="line-header">
+        <span>#</span>
+        <span>Item & Description</span>
+        <span>HSN/SAC</span>
+        <span>Qty</span>
+        <span>Unit</span>
+        <span>Rate (₹)</span>
+        <span>Discount (₹)</span>
+        <span>Taxable (₹)</span>
+        <span>Tax (₹)</span>
+        <span>Amount (₹)</span>
+        <span></span>
+      </div>
+      <div class="line-row" *ngFor="let l of lines(); index as i">
+        <div class="mono">{{ i + 1 }}</div>
+        <div class="stack">
+          <input class="fx-input" [ngModel]="l.name" (ngModelChange)="updateLine(i, { name: $event })" placeholder="Item name" />
+          <input class="fx-input slim" [ngModel]="l.sku" (ngModelChange)="updateLine(i, { sku: $event })" placeholder="SKU / barcode" />
+        </div>
+        <input class="fx-input" [ngModel]="l.hsn" (ngModelChange)="updateLine(i, { hsn: $event })" placeholder="HSN/SAC" />
+        <input class="fx-input" type="number" min="0" [ngModel]="l.qty" (ngModelChange)="updateLine(i, { qty: +$event })" />
+        <input class="fx-input" [ngModel]="l.uom" (ngModelChange)="updateLine(i, { uom: $event })" />
+        <input class="fx-input" type="number" min="0" step="0.1" [ngModel]="l.rate" (ngModelChange)="updateLine(i, { rate: +$event })" />
+        <input class="fx-input" type="number" min="0" step="0.1" [ngModel]="l.discount" (ngModelChange)="updateLine(i, { discount: +$event })" />
+        <div class="mono">{{ lineTotals(l).taxable | number:'1.0-0' }}</div>
+        <div class="mono">{{ lineTotals(l).tax | number:'1.0-0' }}</div>
+        <div class="mono">{{ lineTotals(l).amount | number:'1.0-0' }}</div>
+        <button class="pill-btn danger" type="button" (click)="removeLine(i)" *ngIf="lines().length > 1">✕</button>
+      </div>
+    </div>
+    <div class="row-actions">
+      <button class="pill-btn" type="button" (click)="addLine()">+ Add Another Item</button>
+      <div class="barcode">
+        <span>Search via barcode</span>
+        <input class="fx-input" placeholder="Scan / type code" />
+        <button class="pill-btn ghost" type="button">Go</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="card terms">
+    <div class="section-head">
+      <div class="pill">Terms & Conditions</div>
+      <div class="section-title">Payment, delivery, and special notes</div>
+      <button class="pill-btn" type="button" (click)="addTerm()">+ Add Term</button>
+    </div>
+    <div class="terms-list">
+      <div class="term-row" *ngFor="let t of terms(); index as i">
+        <textarea class="fx-input" rows="2" [ngModel]="t" (ngModelChange)="updateTerm(i, $event)"></textarea>
+        <button class="pill-btn danger" type="button" (click)="removeTerm(i)">Remove</button>
+      </div>
+    </div>
+  </section>
+
+  <div class="form-grid">
+    <section class="card">
+      <div class="section-head">
+        <div class="pill">Notes</div>
+        <div class="section-title">Instructions to supplier</div>
+      </div>
+      <label class="block">
+        <span>Notes</span>
+        <textarea rows="4" class="fx-input" [ngModel]="form().notes" (ngModelChange)="updateField('notes', $event)" placeholder="Payment terms, QA hold, delivery slots..."></textarea>
+      </label>
+      <label class="block">
+        <span>Tags (comma separated)</span>
+        <input class="fx-input" [ngModel]="form().tags" (ngModelChange)="updateField('tags', $event)" />
+      </label>
+    </section>
+
+    <section class="card totals">
+      <div class="section-head">
+        <div class="pill">Totals</div>
+        <div class="section-title">Commercials</div>
+      </div>
+      <div class="total-line">
+        <span>Pre-tax</span>
+        <strong>{{ totals().taxable | number:'1.0-0' }}</strong>
+      </div>
+      <div class="total-line">
+        <span>Tax amount</span>
+        <strong>{{ totals().tax | number:'1.0-0' }}</strong>
+      </div>
+      <div class="total-line">
+        <span>Include round-off</span>
+        <label class="check">
+          <input type="checkbox" [checked]="includeRoundOff()" (change)="includeRoundOff.set(($any($event.target)).checked)" />
+          <span>{{ roundOff() | number:'1.0-2' }}</span>
+        </label>
+      </div>
+      <div class="total-line grand">
+        <span>Grand Total</span>
+        <strong>{{ grandTotal() | number:'1.0-0' }}</strong>
+      </div>
+    </section>
+  </div>
+
+  <section class="card actions">
+    <div class="section-head">
+      <div class="pill">Next Actions</div>
+      <div class="section-title">Template, share, print</div>
+    </div>
+    <div class="actions-grid">
+      <label class="check">
+        <input type="checkbox" [checked]="nextActions().saveTemplate" (change)="setAction('saveTemplate', ($any($event.target)).checked)" />
+        <span>Save as template</span>
+      </label>
+      <input class="fx-input slim" [ngModel]="nextActions().templateName" (ngModelChange)="setAction('templateName', $event)" placeholder="Template name" />
+
+      <label class="check">
+        <input type="checkbox" [checked]="nextActions().shareEmail" (change)="setAction('shareEmail', ($any($event.target)).checked)" />
+        <span>Share by Email</span>
+      </label>
+      <label class="check">
+        <input type="checkbox" [checked]="nextActions().shareWhatsapp" (change)="setAction('shareWhatsapp', ($any($event.target)).checked)" />
+        <span>Share by WhatsApp</span>
+      </label>
+      <input class="fx-input slim" [ngModel]="nextActions().whatsappTo" (ngModelChange)="setAction('whatsappTo', $event)" placeholder="Recipient" />
+
+      <label class="check">
+        <input type="checkbox" [checked]="nextActions().printAfterSave" (change)="setAction('printAfterSave', ($any($event.target)).checked)" />
+        <span>Print document after saving</span>
+      </label>
+    </div>
+
+    <div class="footer-actions">
+      <button class="fx-btn ghost small" type="button" (click)="save(false)">Save</button>
+      <button class="fx-btn small" type="button" (click)="save(true)">Save & Close</button>
+    </div>
+  </section>
+</div>

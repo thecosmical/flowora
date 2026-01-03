@@ -1,0 +1,223 @@
+<div class="fx-container">
+  <section class="fx-head">
+    <div>
+      <h2 class="fx-title">Partner Directory</h2>
+      <div class="fx-sub">Suppliers, logistics vendors, warehouse partners—manage GSTIN, addresses, and linked items (OCR invoice import coming soon).</div>
+    </div>
+    <div class="fx-head-actions">
+      <button class="fx-btn ghost small" type="button">Export</button>
+    </div>
+  </section>
+
+  <section class="fx-card add-supplier">
+    <div class="fx-head">
+      <div>
+        <h3 class="fx-title">Add Partner</h3>
+        <div class="fx-sub">Inline form — no popups. Add GSTIN and address in one go.</div>
+      </div>
+      <button class="fx-btn small" type="button" (click)="addSupplier()">Save Partner</button>
+    </div>
+    <div class="fx-row add-grid">
+      <label class="fx-input-group">
+        <span>Partner Type</span>
+        <select class="fx-select" [ngModel]="newSupplier().partnerType" (ngModelChange)="handlePartnerTypeSelect($event)">
+          <option *ngFor="let t of partnerTypes()" [ngValue]="t">{{ t }}</option>
+          <option [ngValue]="'__add__'">+ Add new type…</option>
+        </select>
+        <div class="inline-add" *ngIf="addTypeMode()">
+          <input class="fx-input" [ngModel]="newTypeValue()" (ngModelChange)="newTypeValue.set($event)" placeholder="e.g., Printing Partner" />
+          <button class="pill-btn" type="button" (click)="confirmNewType()">Add type</button>
+          <button class="pill-btn ghost" type="button" (click)="cancelNewType()">Cancel</button>
+        </div>
+      </label>
+      <label class="fx-input-group">
+        <span>Name</span>
+        <input class="fx-input" [ngModel]="newSupplier().name" (ngModelChange)="setNew('name', $event)" placeholder="Supplier name" />
+      </label>
+      <label class="fx-input-group">
+        <span>Contact Person</span>
+        <input class="fx-input" [ngModel]="newSupplier().contact" (ngModelChange)="setNew('contact', $event)" placeholder="Contact" />
+      </label>
+      <label class="fx-input-group">
+        <span>Phone</span>
+        <input class="fx-input" [ngModel]="newSupplier().phone" (ngModelChange)="setNew('phone', $event)" placeholder="+91 ..." />
+      </label>
+      <label class="fx-input-group">
+        <span>Email</span>
+        <input class="fx-input" [ngModel]="newSupplier().email" (ngModelChange)="setNew('email', $event)" placeholder="email@suppliers.com" />
+      </label>
+      <label class="fx-input-group">
+        <span>GSTIN</span>
+        <div class="gst-row">
+          <input class="fx-input" [ngModel]="newSupplier().gstin" (ngModelChange)="setNew('gstin', $event)" placeholder="GSTIN" />
+          <button class="pill-btn" type="button" (click)="fetchByGstin()">Fetch via GSTIN</button>
+        </div>
+      </label>
+    </div>
+    <div class="fx-row add-grid">
+      <label class="fx-input-group grow">
+        <span>Address</span>
+        <input class="fx-input" [ngModel]="newSupplier().address.line1" (ngModelChange)="setAddress('line1', $event)" placeholder="Line 1" />
+      </label>
+      <label class="fx-input-group">
+        <span>City</span>
+        <input class="fx-input" [ngModel]="newSupplier().address.city" (ngModelChange)="setAddress('city', $event)" />
+      </label>
+      <label class="fx-input-group">
+        <span>State</span>
+        <input class="fx-input" [ngModel]="newSupplier().address.state" (ngModelChange)="setAddress('state', $event)" />
+      </label>
+      <label class="fx-input-group">
+        <span>Country</span>
+        <input class="fx-input" [ngModel]="newSupplier().address.country" (ngModelChange)="setAddress('country', $event)" />
+      </label>
+      <label class="fx-input-group">
+        <span>Address GSTIN</span>
+        <input class="fx-input" [ngModel]="newSupplier().address.gstin" (ngModelChange)="setAddress('gstin', $event)" placeholder="Overrides supplier GSTIN" />
+      </label>
+    </div>
+  </section>
+
+  <div class="fx-row filters">
+    <label class="fx-input-group grow">
+      <span>Search supplier / city / GSTIN</span>
+      <input class="fx-input" [value]="search()" (input)="search.set(($any($event.target)).value)" placeholder="Search by name, contact, GSTIN, city..." />
+    </label>
+  </div>
+
+  <table class="fx-table">
+    <thead>
+    <tr>
+      <th class="fx-th">Partner</th>
+      <th class="fx-th">Type</th>
+      <th class="fx-th">Contact</th>
+      <th class="fx-th">GSTIN</th>
+      <th class="fx-th">Address</th>
+      <th class="fx-th fx-num">Linked Items</th>
+      <th class="fx-th fx-num">Actions</th>
+    </tr>
+    </thead>
+    <tbody>
+    <ng-container *ngFor="let s of rows()">
+      <tr class="fx-tr">
+        <td class="fx-td">
+          <div class="supplier">{{ s.name }}</div>
+        </td>
+        <td class="fx-td">
+          <div class="mono">{{ s.partnerType || 'Supplier' }}</div>
+        </td>
+        <td class="fx-td">
+          <div>{{ s.contact }}</div>
+          <div class="fx-sub">{{ s.phone }} · {{ s.email }}</div>
+        </td>
+        <td class="fx-td mono">{{ s.gstin || 'GSTIN pending' }}</td>
+        <td class="fx-td">
+          <div *ngFor="let a of s.addresses">
+            <div>{{ a.line1 }}</div>
+            <div class="fx-sub">{{ a.city }}, {{ a.state }}, {{ a.country }}</div>
+            <div class="fx-sub">GSTIN: {{ a.gstin || s.gstin || '—' }}</div>
+          </div>
+        </td>
+        <td class="fx-td fx-num">{{ s.linkedItems.length }}</td>
+        <td class="fx-td fx-num">
+          <button class="pill-btn" type="button" (click)="toggle(s.id)">{{ openId() === s.id ? 'Hide' : 'Manage' }}</button>
+        </td>
+      </tr>
+      <tr class="fx-detail" *ngIf="openId() === s.id">
+        <td class="fx-td" colspan="7">
+          <div class="detail-card">
+            <div class="detail-head">
+              <div class="detail-title">Manage {{ s.name }}</div>
+              <button class="pill-btn ghost" type="button" (click)="toggleEdit(s.id)">{{ editMode()[s.id] ? 'Lock' : 'Edit' }}</button>
+            </div>
+            <div class="detail-row">
+              <div><strong>GSTIN:</strong>
+                <ng-container *ngIf="!editMode()[s.id]; else gstEdit">
+                  {{ s.gstin || '—' }}
+                </ng-container>
+                <ng-template #gstEdit>
+                  <input class="fx-input inline" [value]="s.gstin" (input)="updateSupplier(s.id, { gstin: ($any($event.target)).value })" />
+                </ng-template>
+              </div>
+              <div><strong>Type:</strong>
+                <ng-container *ngIf="!editMode()[s.id]; else typeEdit">
+                  {{ s.partnerType || 'Supplier' }}
+                </ng-container>
+                <ng-template #typeEdit>
+                  <select class="fx-select inline" [ngModel]="s.partnerType || 'Supplier'" (ngModelChange)="handleDetailTypeChange(s.id, $event)">
+                    <option *ngFor="let t of partnerTypes()" [ngValue]="t">{{ t }}</option>
+                    <option [ngValue]="'__add__'">+ Add new type…</option>
+                  </select>
+                  <div class="inline-add" *ngIf="editTypeFor() === s.id">
+                    <input class="fx-input inline" [ngModel]="editTypeValue()" (ngModelChange)="editTypeValue.set($event)" placeholder="Enter new partner type" />
+                    <button class="pill-btn" type="button" (click)="applyDetailNewType(s.id)">Add</button>
+                    <button class="pill-btn ghost" type="button" (click)="cancelDetailType()">Cancel</button>
+                  </div>
+                </ng-template>
+              </div>
+              <div><strong>Contact:</strong>
+                <ng-container *ngIf="!editMode()[s.id]; else contactEdit">
+                  {{ s.contact }} · {{ s.phone || '—' }}
+                </ng-container>
+                <ng-template #contactEdit>
+                  <input class="fx-input inline" [value]="s.contact" (input)="updateSupplier(s.id, { contact: ($any($event.target)).value })" />
+                  <input class="fx-input inline" [value]="s.phone" (input)="updateSupplier(s.id, { phone: ($any($event.target)).value })" />
+                </ng-template>
+              </div>
+              <div><strong>Email:</strong>
+                <ng-container *ngIf="!editMode()[s.id]; else emailEdit">
+                  {{ s.email || '—' }}
+                </ng-container>
+                <ng-template #emailEdit>
+                  <input class="fx-input inline" [value]="s.email" (input)="updateSupplier(s.id, { email: ($any($event.target)).value })" />
+                </ng-template>
+              </div>
+            </div>
+            <div class="line-head">Addresses & GST</div>
+            <div class="line-row" *ngFor="let a of s.addresses; let idx = index">
+              <div class="line-item">
+                <ng-container *ngIf="!editMode()[s.id]; else addrEdit">
+                  <div>{{ a.line1 }}</div>
+                  <div class="fx-sub">{{ a.city }}, {{ a.state }}, {{ a.country }}</div>
+                </ng-container>
+                <ng-template #addrEdit>
+                  <input class="fx-input inline" [value]="a.line1" (input)="s.addresses[idx].line1 = ($any($event.target)).value" />
+                  <input class="fx-input inline" [value]="a.city" (input)="s.addresses[idx].city = ($any($event.target)).value" />
+                  <input class="fx-input inline" [value]="a.state" (input)="s.addresses[idx].state = ($any($event.target)).value" />
+                  <input class="fx-input inline" [value]="a.country" (input)="s.addresses[idx].country = ($any($event.target)).value" />
+                </ng-template>
+              </div>
+              <span>GSTIN:
+                <ng-container *ngIf="!editMode()[s.id]; else gstAddrEdit">
+                  {{ a.gstin || s.gstin || '—' }}
+                </ng-container>
+                <ng-template #gstAddrEdit>
+                  <input class="fx-input inline" [value]="a.gstin" (input)="s.addresses[idx].gstin = ($any($event.target)).value" />
+                </ng-template>
+              </span>
+            </div>
+            <div class="line-head">Linked Items</div>
+            <div class="line-row" *ngFor="let li of s.linkedItems">
+              <div class="line-item">
+                <div class="mono">{{ li.sku }}</div>
+                <div>{{ li.name }}</div>
+              </div>
+              <span>HSN {{ li.hsnSac || '-' }}</span>
+              <span>UOM {{ li.uom }}</span>
+            </div>
+            <div class="line-row add-link">
+              <select class="fx-select" (change)="addLinkedItem(s.id, $any($event.target).value)">
+                <option value="">Link another item</option>
+                <option *ngFor="let it of items()" [value]="it.id">{{ it.name }} ({{ it.sku }})</option>
+              </select>
+            </div>
+          </div>
+        </td>
+      </tr>
+    </ng-container>
+    <tr *ngIf="rows().length === 0">
+      <td class="fx-td fx-empty" colspan="7">No suppliers match the filters.</td>
+    </tr>
+    </tbody>
+  </table>
+</div>

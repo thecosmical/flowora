@@ -1,0 +1,17 @@
+.add-link select { min-width: 240px; }
+.line-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 8px; align-items: center; font-size: 13px; }
+.line-head { font-weight: 700; font-size: 13px; color: var(--ink-500); }
+.detail-card { background: #fdfefe; border: 1px solid var(--border-soft); border-radius: 12px; padding: 12px; box-shadow: var(--shadow-xs); display: grid; gap: 10px; }
+.detail-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.detail-title { font-weight: 700; color: var(--color-text); }
+.detail-row { display: flex; gap: 12px; flex-wrap: wrap; font-size: 13px; }
+.supplier { font-weight: 700; }
+.mono { font-family: var(--font-mono, 'SFMono-Regular', ui-monospace, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace); }
+
+.add-supplier { margin: 12px 0; display: grid; gap: 10px; }
+.add-grid { flex-wrap: wrap; }
+.gst-row { display: flex; gap: 8px; align-items: center; }
+.gst-row .pill-btn { white-space: nowrap; }
+.inline { padding: 6px 8px; min-width: 140px; }
+.inline-add { display: flex; gap: 8px; align-items: center; margin-top: 6px; flex-wrap: wrap; }
+.inline-add .fx-input { min-width: 180px; }

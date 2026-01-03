@@ -1,0 +1,157 @@
+<div class="fx-container">
+  <section class="fx-head">
+    <div>
+      <h2 class="fx-title">Bills & Receipts</h2>
+      <div class="fx-sub">Orders already received with partner invoices attached. Track taxable, total, and payment readiness (future: auto-fill via invoice OCR).</div>
+    </div>
+    <div class="fx-head-actions">
+      <button class="fx-btn ghost small" type="button">Export</button>
+      <a class="fx-btn small" routerLink="/procurement/purchases">Back to Orders</a>
+    </div>
+  </section>
+
+  <div class="fx-row filters purchase-filters">
+    <label class="fx-input-group">
+      <span>Timeframe</span>
+      <select class="fx-select" [value]="horizon()" (change)="horizon.set($any($event.target).value)">
+        <option value="THIS_MONTH">This month</option>
+        <option value="LAST_30">Last 30 days</option>
+        <option value="THIS_QUARTER">This quarter</option>
+      </select>
+    </label>
+
+    <label class="fx-input-group">
+      <span>Status</span>
+      <select class="fx-select" [value]="status()" (change)="status.set($any($event.target).value)">
+        <option *ngFor="let s of statuses" [value]="s">{{ s === 'ALL' ? 'All' : s.replace('_', ' ') }}</option>
+      </select>
+    </label>
+
+    <label class="fx-input-group">
+      <span>Branch</span>
+      <select class="fx-select" [value]="branch()" (change)="branch.set($any($event.target).value)">
+        <option *ngFor="let b of branches()" [value]="b">{{ b }}</option>
+      </select>
+    </label>
+
+    <label class="fx-input-group">
+      <span>Owner</span>
+      <select class="fx-select" [value]="owner()" (change)="owner.set($any($event.target).value)">
+        <option *ngFor="let o of owners()" [value]="o">{{ o }}</option>
+      </select>
+    </label>
+
+    <label class="fx-input-group grow">
+      <span>Search partner / invoice / order</span>
+      <input class="fx-input" [value]="search()" (input)="search.set(($any($event.target)).value)" placeholder="Partner, invoice number, purchase order..." />
+    </label>
+  </div>
+
+  <div class="summary-bar">
+    <div class="chip">
+      <span class="label">Bills</span>
+      <span class="value">{{ summary().count }}</span>
+    </div>
+    <div class="chip">
+      <span class="label">Pre-tax</span>
+      <span class="value">{{ formatCurrency(summary().taxable) }}</span>
+    </div>
+    <div class="chip">
+      <span class="label">Total</span>
+      <span class="value">{{ formatCurrency(summary().total) }}</span>
+    </div>
+    <div class="chip highlight" *ngIf="rows()[0] as next">
+      <span class="label">Latest Invoice</span>
+      <span class="value">{{ next.invoiceDate }}</span>
+    </div>
+  </div>
+
+  <div class="insight-card">
+    <div class="pill">After Receiving</div>
+    <div class="copy">
+      <strong>Ops + Procurement</strong> reconcile invoices to purchase orders, mark ready for payment, and keep GRN/audit links handy.
+    </div>
+  </div>
+
+  <table class="fx-table purchase-table">
+    <thead>
+    <tr>
+      <th class="fx-th">Partner</th>
+      <th class="fx-th">Contact</th>
+      <th class="fx-th">Invoice</th>
+      <th class="fx-th">Purchase Order</th>
+      <th class="fx-th">Invoice Date</th>
+      <th class="fx-th">Status</th>
+      <th class="fx-th fx-num">Pre-tax (₹)</th>
+      <th class="fx-th fx-num">Total (₹)</th>
+      <th class="fx-th">Owner</th>
+      <th class="fx-th fx-num">Actions</th>
+    </tr>
+    </thead>
+    <tbody>
+    <ng-container *ngFor="let i of rows()">
+      <tr class="fx-tr">
+        <td class="fx-td">
+          <div class="supplier">{{ i.supplier }}</div>
+          <div class="fx-sub">{{ i.branch }}</div>
+        </td>
+        <td class="fx-td">
+          <div>{{ i.contact }}</div>
+          <div class="fx-sub">{{ i.contactPhone }}</div>
+        </td>
+        <td class="fx-td">
+          <div class="mono">{{ i.invoiceNo }}</div>
+          <div class="fx-sub">{{ i.creditMonth }}</div>
+        </td>
+        <td class="fx-td">
+          <div class="mono">{{ i.purchaseOrderId || 'Not linked' }}</div>
+          <div class="fx-sub">{{ i.purchaseOrderRef || '—' }}</div>
+        </td>
+        <td class="fx-td fx-mono">{{ i.invoiceDate }}</td>
+        <td class="fx-td">
+          <span class="fx-pill status" [ngClass]="i.status.toLowerCase()">{{ i.status.replace('_', ' ') }}</span>
+        </td>
+        <td class="fx-td fx-num">{{ formatCurrency(i.taxable) }}</td>
+        <td class="fx-td fx-num">{{ formatCurrency(i.total) }}</td>
+        <td class="fx-td">
+          <div>{{ i.owner }}</div>
+          <div class="fx-sub">{{ i.notes }}</div>
+        </td>
+        <td class="fx-td fx-num">
+          <div class="action-group">
+            <button class="pill-btn" type="button" (click)="toggle(i.id)">{{ openId() === i.id ? 'Hide details' : 'Details' }}</button>
+            <button class="pill-btn" type="button" (click)="markReady(i.id)" *ngIf="i.status === 'AWAITING_GRN'">Ready for payment</button>
+            <button class="pill-btn" type="button" (click)="markPaid(i.id)" *ngIf="i.status === 'READY_FOR_PAYMENT'">Mark paid</button>
+          </div>
+        </td>
+      </tr>
+      <tr class="fx-detail" *ngIf="openId() === i.id">
+        <td class="fx-td" colspan="10">
+          <div class="detail-card">
+            <div class="detail-row">
+              <div><strong>Purchase Order:</strong> {{ i.purchaseOrderId || 'Not linked' }}</div>
+              <div><strong>Quotation:</strong> {{ i.purchaseOrderRef || '—' }}</div>
+              <div><strong>Notes:</strong> {{ i.notes || '—' }}</div>
+            </div>
+            <div class="line-head">Lines</div>
+            <div class="line-row" *ngFor="let l of i.lines">
+              <div class="line-item">
+                <div class="mono">{{ l.sku }}</div>
+                <div>{{ l.name }}</div>
+              </div>
+              <span>HSN {{ l.hsn || '-' }}</span>
+              <span>Qty {{ l.qty }} {{ l.uom }}</span>
+              <span>Rate {{ formatCurrency(l.rate, 'INR', 0) }}</span>
+              <span>Tax {{ l.taxRate }}%</span>
+              <span class="reason">Est {{ formatCurrency((l.qty * l.rate) - (l.discount || 0), 'INR', 0) }}</span>
+            </div>
+          </div>
+        </td>
+      </tr>
+    </ng-container>
+    <tr *ngIf="rows().length === 0">
+      <td class="fx-td fx-empty" colspan="10">No received purchase orders match the filters.</td>
+    </tr>
+    </tbody>
+  </table>
+</div>
